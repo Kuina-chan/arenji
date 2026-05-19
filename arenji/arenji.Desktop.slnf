@@ -1,0 +1,11 @@
+﻿{
+  "solution": {
+    "path": "arenji.sln",
+    "projects": [
+      "arenji.Desktop\\arenji.Desktop.csproj",
+      "arenji.Game\\arenji.Game.csproj",
+      "arenji.Game.Tests\\arenji.Game.Tests.csproj",
+      "arenji.Resources\\arenji.Resources.csproj"
+    ]
+  }
+}

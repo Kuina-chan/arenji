@@ -1,0 +1,10 @@
+{
+  "solution": {
+    "path": "arenji.sln",
+    "projects": [
+      "arenji.Game\\arenji.Game.csproj",
+      "arenji.Resources\\arenji.Resources.csproj",
+      "arenji.iOS\\arenji.iOS.csproj"
+    ]
+  }
+}

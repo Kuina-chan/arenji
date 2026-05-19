@@ -1,0 +1,658 @@
+version=1
+
+# This file caches language service data to improve the performance of C# Dev Kit.
+# It is not intended for manual editing. It can safely be deleted and will be
+# regenerated automatically. For more information, see https://aka.ms/lscache
+#
+# To control where cache files are stored, use the following VS Code setting:
+#   "dotnet.projectsystem.cacheInProjectFolder": true
+
+[project]
+language=C#
+primary
+lastDtbSucceeded
+
+[properties]
+AssemblyName=osu.Framework.Tests
+CommandLineArgsForDesignTimeEvaluation=-langversion:12.0 -define:TRACE
+CompilerGeneratedFilesOutputPath=
+MaxSupportedLangVersion=12.0
+ProjectAssetsFile=<PATH>obj/project.assets.json
+RootNamespace=osu.Framework.Tests
+RunAnalyzers=
+RunAnalyzersDuringLiveAnalysis=
+SolutionPath=<PATH>../osu-framework.sln
+TargetFrameworkIdentifier=.NETCoreApp
+TargetPath=<PATH>bin/Debug/net8.0/osu.Framework.Tests.dll
+TargetRefPath=<PATH>obj/Debug/net8.0/ref/osu.Framework.Tests.dll
+TemporaryDependencyNodeTargetIdentifier=net8.0
+
+[commandLineArguments]
+/noconfig
+/unsafe-
+/checked-
+/nowarn:CS1591,1701,1702
+/fullpaths
+/nostdlib+
+/errorreport:prompt
+/warn:8
+/doc:obj/Debug/net8.0/osu.Framework.Tests.xml
+/define:TRACE;DEBUG;NET;NET8_0;NETCOREAPP;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NETCOREAPP1_0_OR_GREATER;NETCOREAPP1_1_OR_GREATER;NETCOREAPP2_0_OR_GREATER;NETCOREAPP2_1_OR_GREATER;NETCOREAPP2_2_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER
+/highentropyva+
+/nullable:enable
+/debug+
+/debug:portable
+/filealign:512
+/optimize-
+/out:obj/Debug/net8.0/osu.Framework.Tests.dll
+/refout:obj/Debug/net8.0/refint/osu.Framework.Tests.dll
+/target:winexe
+/warnaserror-
+/utf8output
+/deterministic+
+/langversion:12.0
+/warnaserror+:NU1605,SYSLIB0011
+
+[sourceFiles]
+Audio/
+ AudioCollectionManagerTest.cs
+ AudioComponentTest.cs
+ AudioManagerWithDeviceLoss.cs
+ AudioTestHelper.cs
+ AudioThreadTest.cs
+ BassAudioMixerTest.cs
+ BassTestComponents.cs
+ DevicelessAudioTest.cs
+ DeviceLosingAudioTest.cs
+ DrawableAudioWrapperTest.cs
+ SampleBassInitTest.cs
+ SampleBassTest.cs
+ SampleChannelVirtualTest.cs
+ TestAudioAdjustments.cs
+ TestSceneDrawableTrack.cs
+ TrackBassTest.cs
+ TrackVirtualTest.cs
+AutomatedVisualTestGame.cs
+Bindables/
+ AggregateBindableTest.cs
+ BindableBindingTest.cs
+ BindableBoolTest.cs
+ BindableColour4Test.cs
+ BindableDictionaryTest.cs
+ BindableDoubleTest.cs
+ BindableEnumTest.cs
+ BindableFloatTest.cs
+ BindableIntTest.cs
+ BindableLeasingTest.cs
+ BindableListTest.cs
+ BindableLongTest.cs
+ BindableMarginPaddingTest.cs
+ BindableNumberTest.cs
+ BindableSerializationTest.cs
+ BindableSizeTest.cs
+ BindableStringTest.cs
+ BindableTest.cs
+ BindableWithCurrentTest.cs
+ RangeConstrainedBindableTest.cs
+Clocks/
+ DecouplingFramedClockTest.cs
+ InterpolatingFramedClockTest.cs
+ StopwatchClockTest.cs
+ TestClock.cs
+ TestNonAdjustableClock.cs
+ TestStopwatchClockWithRangeLimit.cs
+Configuration/
+ FrameworkConfigManagerTest.cs
+ InputConfigManagerTest.cs
+Containers/
+ ContainerEnumerableTest.cs
+ TestSceneCompositeMutability.cs
+ TestSceneContainerState.cs
+ TestSceneEnumeratorVersion.cs
+ TestSceneLoadComponentAsync.cs
+ TestSceneLongRunningLoad.cs
+ TestSceneSyncDisposal.cs
+Dependencies/Reflection/
+ CachedAttributeTest.cs
+ CachedModelDependenciesTest.cs
+ DependencyContainerTest.cs
+ ResolvedAttributeTest.cs
+Dependencies/SourceGeneration/
+ CachedAttributeTest.cs
+ CachedModelDependenciesTest.cs
+ DependencyContainerTest.cs
+ ResolvedAttributeTest.cs
+Exceptions/
+ TestAddRemoveExceptions.cs
+ TestLoadExceptions.cs
+ TestSceneDependencyInjectionExceptions.cs
+Extensions/
+ TestExtensions.cs
+ TestIsNullableTypeExtensions.cs
+ TestStreamExtensions.cs
+FlakyTestAttribute.cs
+Graphics/
+ ColourTest.cs
+ LifetimeEntryManagerTest.cs
+ RendererTest.cs
+ ShaderRegexTest.cs
+ ShaderStorageBufferObjectStackTest.cs
+ TestSceneDrawableScheduling.cs
+ TextureAtlasTest.cs
+ TextureRegionTest.cs
+ TripleBufferTest.cs
+Input/
+ HandleInputCache/HandleInputCacheTest.cs
+ JoystickInputTest.cs
+ KeyBindingInputTest.cs
+ KeyboardInputTest.cs
+ KeyCombinationTest.cs
+ MouseInputTest.cs
+ ReadableKeyCombinationTest.cs
+ TouchInputTest.cs
+IO/
+ BackgroundGameHeadlessGameHost.cs
+ DllResourceStoreTest.cs
+ FontStoreTest.cs
+ TestDesktopStorage.cs
+ TestLogging.cs
+ TestOnlineStore.cs
+ TestSortedListSerialization.cs
+ TestWebRequest.cs
+ TextureStoreTest.cs
+Layout/
+ TestSceneContainerLayout.cs
+ TestSceneDrawableLayout.cs
+ TestSceneGridContainerLayout.cs
+ TestSceneSpriteLayout.cs
+Lists/
+ TestArrayExtensions.cs
+ TestEnumerableExtensions.cs
+ TestSortedList.cs
+ TestWeakList.cs
+Localisation/
+ CultureInfoHelperTest.cs
+ LocalisableDescriptionAttributeTest.cs
+ LocalisableStringTest.cs
+ LocalisationTest.cs
+ ThreadCultureTest.cs
+MathUtils/
+ TestInterpolation.cs
+ TestPathApproximator.cs
+obj/Debug/net8.0/
+ .NETCoreApp,Version=v8.0.AssemblyAttributes.cs
+ osu.Framework.Tests.AssemblyInfo.cs
+Platform/
+ ComponentAsyncDisposalTest.cs
+ GameExitTest.cs
+ GameHostSuspendTest.cs
+ HeadlessGameHostTest.cs
+ IPCTest.cs
+ PortableInstallationTest.cs
+ UserInputManagerTest.cs
+ UserStorageLookupTest.cs
+Polygons/
+ ConvexPolygonClipperFuzzingTest.cs
+ ConvexPolygonClippingTest.cs
+ LineIntersections.cs
+Primitives/
+ QuadTest.cs
+ TriangleTest.cs
+ Vector2ExtensionsTest.cs
+Program.cs
+Shaders/
+ TestSceneShaderDisposal.cs
+ TestShaderLoading.cs
+Sprites/TestSceneSpriteTextPresence.cs
+TestGame.cs
+Text/TextBuilderTest.cs
+Threading/
+ AsyncDisposalQueueTest.cs
+ SchedulerTest.cs
+ ThreadedTaskSchedulerTest.cs
+Transforms/TestSceneTransformEventBindings.cs
+Visual/Audio/
+ TestSceneAudioManager.cs
+ TestSceneAudioMixer.cs
+ TestSceneSampleAmplitudes.cs
+ TestSceneSampleChannels.cs
+ TestSceneSampleLooping.cs
+ TestSceneSamples.cs
+ TestSceneTrackAdjustments.cs
+ TestSceneTrackAmplitudes.cs
+Visual/Bindables/
+ TestSceneBindableAutoUnbinding.cs
+ TestSceneBindableNumbers.cs
+Visual/Clocks/
+ LaggyFramedClock.cs
+ TestSceneClock.cs
+ TestSceneClocks.cs
+Visual/Containers/
+ TestSceneBufferedContainer.cs
+ TestSceneBufferedContainerClipping.cs
+ TestSceneCachedBufferedContainer.cs
+ TestSceneCircularContainer.cs
+ TestSceneCircularContainerSizing.cs
+ TestSceneCompositeDrawable.cs
+ TestSceneCoordinateSpaces.cs
+ TestSceneCursorContainer.cs
+ TestSceneCustomizableTextContainer.cs
+ TestSceneDrawSizePreservingFillContainer.cs
+ TestSceneDynamicDepth.cs
+ TestSceneFrontToBack.cs
+ TestSceneFrontToBackBox.cs
+ TestSceneFrontToBackBufferedContainer.cs
+ TestSceneFrontToBackTriangle.cs
+ TestSceneLifetimeManagementContainer.cs
+ TestSceneMasking.cs
+ TestScenePadding.cs
+ TestSceneSafeAreaContainer.cs
+ TestSceneSafeAreaOverrides.cs
+ TestSceneScrollContainer.cs
+ TestSceneScrollContainerDoublePrecision.cs
+ TestSceneScrollContainerNested.cs
+ TestSceneSizing.cs
+ TestSceneTextFlowContainer.cs
+ TestSceneVirtualisedListContainer.cs
+ TestSceneVisibilityContainer.cs
+Visual/Drawables/
+ TestSceneAutoSize.cs
+ TestSceneBlending.cs
+ TestSceneBorderColour.cs
+ TestSceneBorderSmoothing.cs
+ TestSceneCircularArcBoundingBox.cs
+ TestSceneColourGradient.cs
+ TestSceneColourInfoInterpolation.cs
+ TestSceneComplexBlending.cs
+ TestSceneConcurrentLoad.cs
+ TestSceneCubicBezierEasing.cs
+ TestSceneCustomEasingCurve.cs
+ TestSceneDelayedLoadUnloadWrapper.cs
+ TestSceneDelayedLoadWrapper.cs
+ TestSceneDrawableLoadCancellation.cs
+ TestSceneDrawablePool.cs
+ TestSceneDrawableScale.cs
+ TestSceneDrawNodeDisposal.cs
+ TestSceneEasingCurves.cs
+ TestSceneEffects.cs
+ TestSceneFastCircle.cs
+ TestSceneFillModes.cs
+ TestSceneFocus.cs
+ TestSceneGammaCorrection.cs
+ TestSceneHollowEdgeEffect.cs
+ TestSceneInteractivePathDrawing.cs
+ TestSceneIsMaskedAway.cs
+ TestSceneModelBackedDrawable.cs
+ TestSceneModelBackedDrawableWithLoading.cs
+ TestSceneModelBackedDrawableWithUnloading.cs
+ TestScenePathApproximator.cs
+ TestScenePathCapAngles.cs
+ TestScenePathWithZeroLength.cs
+ TestScenePiecewiseLinearToBSpline.cs
+ TestScenePropertyBoundaries.cs
+ TestSceneProxyDrawableLifetime.cs
+ TestSceneProxyDrawables.cs
+ TestSceneSpring.cs
+ TestSceneStressGLDisposal.cs
+ TestSceneSynchronizationContext.cs
+ TestSceneTransformRewinding.cs
+ TestSceneTransformSequence.cs
+ TestSceneUpdateBeforeDraw.cs
+ TestSceneWaveform.cs
+Visual/
+ FrameworkGridTestScene.cs
+ FrameworkTestScene.cs
+ FrameworkTestSceneTestRunner.cs
+ Graphics/
+  TestSceneColours.cs
+  TestSceneScissor.cs
+  TestSceneShaderStorageBufferObject.cs
+  TestSceneStencil.cs
+  TestSceneTexturePremultiplication.cs
+  TestSceneTripleBufferOccupancy.cs
+  TestSceneVertexBatching.cs
+ Input/
+  TestSceneClickLenience.cs
+  TestSceneHandleInput.cs
+  TestSceneInputManager.cs
+  TestSceneInputPropagationForLoadStates.cs
+  TestSceneInputQueueChange.cs
+  TestSceneInputResampler.cs
+  TestSceneJoystick.cs
+  TestSceneKeyBindingContainer.cs
+  TestSceneKeyBindingInputQueueChange.cs
+  TestSceneKeyBindingsGrid.cs
+  TestSceneMidi.cs
+  TestSceneMouseStates.cs
+  TestSceneNestedHover.cs
+  TestScenePassThroughInputManager.cs
+  TestScenePathInput.cs
+  TestScenePlatformActionContainer.cs
+  TestSceneReadableKeyCombinationProvider.cs
+  TestSceneTabletInput.cs
+  TestSceneTouchInput.cs
+  TestSceneTouchVisualiser.cs
+ Layout/
+  TestSceneFillFlowContainer.cs
+  TestSceneFitInsideFlow.cs
+  TestSceneGridContainer.cs
+  TestSceneLayoutDurations.cs
+  TestSceneLayoutTransformRewinding.cs
+  TestSceneScrollableFlow.cs
+  TestSceneTableContainer.cs
+ Localisation/
+  LocalisationTestScene.cs
+  TestSceneTextFlowContainerLocalisation.cs
+ Performance/
+  PerformanceTestScene.cs
+  RepeatedDrawablePerformanceTestScene.cs
+  TestSceneBlendingPerformance.cs
+  TestSceneBoxPerformance.cs
+  TestSceneBufferingPerformance.cs
+  TestSceneCircleBoxAlternatePerformance.cs
+  TestSceneCircularProgressRingsPerformance.cs
+  TestSceneFastCircleBoxAlternatePerformance.cs
+  TestSceneFastCirclePerformance.cs
+  TestSceneMaskingPerformance.cs
+  TestSceneSpriteTextPerformance.cs
+  TestSceneTexturePerformance.cs
+  TestSceneTextureUploadPerformance.cs
+  TestSceneVertexUploadPerformance.cs
+ Platform/
+  FrameworkConfigVisualiser.cs
+  TestSceneActiveState.cs
+  TestSceneAllowSuspension.cs
+  TestSceneBlockExiting.cs
+  TestSceneBorderless.cs
+  TestSceneClipboard.cs
+  TestSceneCurrentDisplay.cs
+  TestSceneDebugUtils.cs
+  TestSceneDisplayBoundsWindowBorder.cs
+  TestSceneDisplayMode.cs
+  TestSceneExecutionModes.cs
+  TestSceneExternalLinks.cs
+  TestSceneFullscreen.cs
+  TestScenePresentFileExternally.cs
+  TestSceneRaiseWindow.cs
+  TestSceneRenderer.cs
+  TestSceneResourceStores.cs
+  TestSceneWindowed.cs
+  TestSceneWindowFlash.cs
+  TestSceneWindowModeResizedEvent.cs
+  WindowDisplaysPreview.cs
+ Sprites/
+  TestSceneAnimation.cs
+  TestSceneAnimationLayout.cs
+  TestSceneBufferedContainerView.cs
+  TestSceneLargeTextureStore.cs
+  TestSceneNineSliceSprite.cs
+  TestSceneRomanisableSpriteText.cs
+  TestSceneScreenshot.cs
+  TestSceneSmoothedEdges.cs
+  TestSceneSpriteIcon.cs
+  TestSceneSpriteText.cs
+  TestSceneSpriteTextMaxWidth.cs
+  TestSceneSpriteTextScenarios.cs
+  TestSceneSpriteTextSizing.cs
+  TestSceneSpriteTextTruncate.cs
+  TestSceneTextFlow.cs
+  TestSceneTextureCropping.cs
+  TestSceneTexturedTriangle.cs
+  TestSceneTextures.cs
+  TestSceneTriangles.cs
+  TestSceneVideo.cs
+  TestSceneVideoLayout.cs
+  TestSceneWrapModes.cs
+  TestVideo.cs
+ Testing/
+  TestSceneAudioMixerVisualiser.cs
+  TestSceneDerivedTestWithDerivedMethods.cs
+  TestSceneDerivedTestWithDerivedMethodsWithAttributes.cs
+  TestSceneDerivedTestWithDerivedSource.cs
+  TestSceneDrawVisualiser.cs
+  TestSceneGlobalStatisticsDisplay.cs
+  TestSceneIgnore.cs
+  TestSceneManualInputManagerTestScene.cs
+  TestSceneNestedGame.cs
+  TestSceneStepButton.cs
+  TestSceneTest.cs
+  TestSceneTestingExtensions.cs
+  TestSceneTestRetry.cs
+  TestSceneTestWithExternalSource.cs
+  TestSceneTestWithSource.cs
+  TestSceneTestWithValues.cs
+ UserInterface/
+  TestSceneButton.cs
+  TestSceneCheckboxes.cs
+  TestSceneCircularBlob.cs
+  TestSceneCircularProgress.cs
+  TestSceneClosableMenu.cs
+  TestSceneColourPicker.cs
+  TestSceneContextMenu.cs
+  TestSceneCountingText.cs
+  TestSceneDirectorySelector.cs
+  TestSceneDrawablePath.cs
+  TestSceneDropdown.cs
+  TestSceneFileSelector.cs
+  TestSceneFocusedOverlayContainer.cs
+  TestSceneHexColourPicker.cs
+  TestSceneHSVColourPicker.cs
+  TestSceneMarkdownContainer.cs
+  TestSceneNestedMenus.cs
+  TestScenePopover.cs
+  TestScenePopoverContainer.cs
+  TestSceneRearrangeableListContainer.cs
+  TestSceneRigidBody.cs
+  TestSceneScreenStack.cs
+  TestSceneSearchContainer.cs
+  TestSceneSliderBar.cs
+  TestSceneTabControl.cs
+  TestSceneTabControlEvents.cs
+  TestSceneTextBox.cs
+  TestSceneTextBoxEvents.cs
+  TestSceneTextBoxKeyEvents.cs
+  TestSceneTextInputProperties.cs
+  TestSceneTooltip.cs
+  TestSceneUnclosableMenu.cs
+  TestUIComponentsWithCurrent.cs
+VisualTestGame.cs
+
+[metadataReferences]
+../osu.Framework/obj/Debug/net8.0/ref/osu.Framework.dll
+<DOTNET>/packs/Microsoft.NETCore.App.Ref/8.0.26/ref/net8.0/
+ Microsoft.CSharp.dll
+ Microsoft.VisualBasic.Core.dll
+ Microsoft.VisualBasic.dll
+ Microsoft.Win32.Primitives.dll
+ Microsoft.Win32.Registry.dll
+ mscorlib.dll
+ netstandard.dll
+ System.AppContext.dll
+ System.Buffers.dll
+ System.Collections.Concurrent.dll
+ System.Collections.dll
+ System.Collections.Immutable.dll
+ System.Collections.NonGeneric.dll
+ System.Collections.Specialized.dll
+ System.ComponentModel.Annotations.dll
+ System.ComponentModel.DataAnnotations.dll
+ System.ComponentModel.dll
+ System.ComponentModel.EventBasedAsync.dll
+ System.ComponentModel.Primitives.dll
+ System.ComponentModel.TypeConverter.dll
+ System.Configuration.dll
+ System.Console.dll
+ System.Core.dll
+ System.Data.Common.dll
+ System.Data.DataSetExtensions.dll
+ System.Data.dll
+ System.Diagnostics.Contracts.dll
+ System.Diagnostics.Debug.dll
+ System.Diagnostics.DiagnosticSource.dll
+ System.Diagnostics.FileVersionInfo.dll
+ System.Diagnostics.Process.dll
+ System.Diagnostics.StackTrace.dll
+ System.Diagnostics.TextWriterTraceListener.dll
+ System.Diagnostics.Tools.dll
+ System.Diagnostics.TraceSource.dll
+ System.Diagnostics.Tracing.dll
+ System.dll
+ System.Drawing.dll
+ System.Drawing.Primitives.dll
+ System.Dynamic.Runtime.dll
+ System.Formats.Asn1.dll
+ System.Formats.Tar.dll
+ System.Globalization.Calendars.dll
+ System.Globalization.dll
+ System.Globalization.Extensions.dll
+ System.IO.Compression.Brotli.dll
+ System.IO.Compression.dll
+ System.IO.Compression.FileSystem.dll
+ System.IO.Compression.ZipFile.dll
+ System.IO.dll
+ System.IO.FileSystem.AccessControl.dll
+ System.IO.FileSystem.dll
+ System.IO.FileSystem.DriveInfo.dll
+ System.IO.FileSystem.Primitives.dll
+ System.IO.FileSystem.Watcher.dll
+ System.IO.IsolatedStorage.dll
+ System.IO.MemoryMappedFiles.dll
+ System.IO.Pipes.AccessControl.dll
+ System.IO.Pipes.dll
+ System.IO.UnmanagedMemoryStream.dll
+ System.Linq.dll
+ System.Linq.Expressions.dll
+ System.Linq.Parallel.dll
+ System.Linq.Queryable.dll
+ System.Memory.dll
+ System.Net.dll
+ System.Net.Http.dll
+ System.Net.Http.Json.dll
+ System.Net.HttpListener.dll
+ System.Net.Mail.dll
+ System.Net.NameResolution.dll
+ System.Net.NetworkInformation.dll
+ System.Net.Ping.dll
+ System.Net.Primitives.dll
+ System.Net.Quic.dll
+ System.Net.Requests.dll
+ System.Net.Security.dll
+ System.Net.ServicePoint.dll
+ System.Net.Sockets.dll
+ System.Net.WebClient.dll
+ System.Net.WebHeaderCollection.dll
+ System.Net.WebProxy.dll
+ System.Net.WebSockets.Client.dll
+ System.Net.WebSockets.dll
+ System.Numerics.dll
+ System.Numerics.Vectors.dll
+ System.ObjectModel.dll
+ System.Reflection.DispatchProxy.dll
+ System.Reflection.dll
+ System.Reflection.Emit.dll
+ System.Reflection.Emit.ILGeneration.dll
+ System.Reflection.Emit.Lightweight.dll
+ System.Reflection.Extensions.dll
+ System.Reflection.Metadata.dll
+ System.Reflection.Primitives.dll
+ System.Reflection.TypeExtensions.dll
+ System.Resources.Reader.dll
+ System.Resources.ResourceManager.dll
+ System.Resources.Writer.dll
+ System.Runtime.CompilerServices.Unsafe.dll
+ System.Runtime.CompilerServices.VisualC.dll
+ System.Runtime.dll
+ System.Runtime.Extensions.dll
+ System.Runtime.Handles.dll
+ System.Runtime.InteropServices.dll
+ System.Runtime.InteropServices.JavaScript.dll
+ System.Runtime.InteropServices.RuntimeInformation.dll
+ System.Runtime.Intrinsics.dll
+ System.Runtime.Loader.dll
+ System.Runtime.Numerics.dll
+ System.Runtime.Serialization.dll
+ System.Runtime.Serialization.Formatters.dll
+ System.Runtime.Serialization.Json.dll
+ System.Runtime.Serialization.Primitives.dll
+ System.Runtime.Serialization.Xml.dll
+ System.Security.AccessControl.dll
+ System.Security.Claims.dll
+ System.Security.Cryptography.Algorithms.dll
+ System.Security.Cryptography.Cng.dll
+ System.Security.Cryptography.Csp.dll
+ System.Security.Cryptography.dll
+ System.Security.Cryptography.Encoding.dll
+ System.Security.Cryptography.OpenSsl.dll
+ System.Security.Cryptography.Primitives.dll
+ System.Security.Cryptography.X509Certificates.dll
+ System.Security.dll
+ System.Security.Principal.dll
+ System.Security.Principal.Windows.dll
+ System.Security.SecureString.dll
+ System.ServiceModel.Web.dll
+ System.ServiceProcess.dll
+ System.Text.Encoding.CodePages.dll
+ System.Text.Encoding.dll
+ System.Text.Encoding.Extensions.dll
+ System.Text.Encodings.Web.dll
+ System.Text.Json.dll
+ System.Text.RegularExpressions.dll
+ System.Threading.Channels.dll
+ System.Threading.dll
+ System.Threading.Overlapped.dll
+ System.Threading.Tasks.Dataflow.dll
+ System.Threading.Tasks.dll
+ System.Threading.Tasks.Extensions.dll
+ System.Threading.Tasks.Parallel.dll
+ System.Threading.Thread.dll
+ System.Threading.ThreadPool.dll
+ System.Threading.Timer.dll
+ System.Transactions.dll
+ System.Transactions.Local.dll
+ System.ValueTuple.dll
+ System.Web.dll
+ System.Web.HttpUtility.dll
+ System.Windows.dll
+ System.Xml.dll
+ System.Xml.Linq.dll
+ System.Xml.ReaderWriter.dll
+ System.Xml.Serialization.dll
+ System.Xml.XDocument.dll
+ System.Xml.XmlDocument.dll
+ System.Xml.XmlSerializer.dll
+ System.Xml.XPath.dll
+ System.Xml.XPath.XDocument.dll
+ WindowsBase.dll
+
+[analyzerReferences]
+<DOTNET>/packs/Microsoft.NETCore.App.Ref/8.0.26/analyzers/dotnet/cs/
+ Microsoft.Interop.ComInterfaceGenerator.dll
+ Microsoft.Interop.JavaScript.JSImportGenerator.dll
+ Microsoft.Interop.LibraryImportGenerator.dll
+ Microsoft.Interop.SourceGeneration.dll
+ System.Text.Json.SourceGeneration.dll
+ System.Text.RegularExpressions.Generator.dll
+<DOTNET>/sdk/8.0.126/Sdks/Microsoft.NET.Sdk/analyzers/
+ Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll
+ Microsoft.CodeAnalysis.NetAnalyzers.dll
+
+[analyzerConfigFiles]
+../
+ .editorconfig
+ CodeAnalysis/osu-framework.globalconfig
+<DOTNET>/sdk/8.0.126/Sdks/Microsoft.NET.Sdk/analyzers/build/config/
+ analysisleveldesign_8_default.globalconfig
+ analysisleveldocumentation_8_recommended.globalconfig
+ analysislevelglobalization_8_recommended.globalconfig
+ analysislevelinteroperability_8_recommended.globalconfig
+ analysislevelmaintainability_8_recommended.globalconfig
+ analysislevelnaming_8_default.globalconfig
+ analysislevelperformance_8_minimum.globalconfig
+ analysislevelreliability_8_recommended.globalconfig
+ analysislevelsecurity_8_default.globalconfig
+ analysislevelusage_8_default.globalconfig
+ analysislevel_8_default.globalconfig
+obj/Debug/net8.0/osu.Framework.Tests.GeneratedMSBuildEditorConfig.editorconfig
+
+[additionalFiles]
+../CodeAnalysis/BannedSymbols.txt
