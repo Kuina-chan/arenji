@@ -10,6 +10,10 @@ using osuTK.Graphics;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.Bindings;
 using System.Collections.Generic;
+using osu.Framework.Audio;
+using System.Threading.Tasks;
+using System;
+using System.IO;
 namespace arenji.Game
 {
     public partial class arenjiVisualizer : Screen, IKeyBindingHandler<ArenjiAction>
@@ -17,9 +21,14 @@ namespace arenji.Game
         private VirtualKeyboard keyboard;
         private Container noteCanvas;
         private arenjiSettings settingsPanel;
-        private osu.Framework.Timing.StopwatchClock manualClock;
+        //private osu.Framework.Timing.StopwatchClock manualClock;
         private arenjiPlaybackControl controlPanel;
-
+        [Resolved]
+        private AudioManager osuAudioManager { get; set; }
+        private IArenjiAudioEngine activeAudioEngine;
+        
+        // ADD THIS LINE:
+        private int currentLoadId = 0;
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -60,15 +69,25 @@ namespace arenji.Game
             };
         }
 
-        public void LoadNewMidi(MidiFile midiFile)
+        public void LoadNewMidi(string midiPath, MidiFile midiFile)
         {
+            // 1. THE KILL SWITCH: Stop and destroy the old audio instantly
+            if (activeAudioEngine != null)
+            {
+                activeAudioEngine.Pause();
+                activeAudioEngine.Dispose();
+            }
+
+            // 2. Increment the ID for this specific load attempt
+            int myLoadId = ++currentLoadId;
             noteCanvas.Clear();
             var tempoMap = midiFile.GetTempoMap();
             var rawNotes = midiFile.GetNotes();
 
             double lastNoteEndTime = 0; 
             
-            // 1. Create a list to hold all the note data for the keyboard
+            // 1. THIS IS THE MISSING VARIABLE! 
+            // We create the list here so the keyboard can use it later.
             var allVisualNotes = new List<VisualNoteData>();
 
             foreach (var note in rawNotes)
@@ -88,22 +107,38 @@ namespace arenji.Game
                     WhiteKeyIndex = CountWhiteKeysBefore(note.NoteNumber)
                 };
 
-                // Add the data to our list
+                // Add to our list for the keyboard
                 allVisualNotes.Add(noteData);
 
                 noteCanvas.Add(new DrawableMidiNote(noteData, settingsPanel));
             }
-            
-            manualClock = new osu.Framework.Timing.StopwatchClock(true); 
-            
-            // 2. Sync the canvas AND the keyboard to the exact same custom clock!
-            noteCanvas.Clock = new osu.Framework.Timing.FramedClock(manualClock);
-            keyboard.Clock = new osu.Framework.Timing.FramedClock(manualClock);
-            
-            // 3. Hand the sorted data down to the keyboard
-            keyboard.LoadNotes(allVisualNotes);
 
-            controlPanel.LinkClock(manualClock, lastNoteEndTime + 2000);
+            // 2. Create the SoundFont engine
+            activeAudioEngine = new ArenjiSoundFontEngine(osuAudioManager);
+
+            Task.Run(() =>
+            {
+                // CHANGE THIS TO YOUR ACTUAL SF2 PATH!
+                string mySoundFontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "sf", "Touhou.sf2");
+                
+                // Tell the interface to load the files
+                activeAudioEngine.LoadFiles(midiPath, mySoundFontPath);
+                
+                Schedule(() =>
+                {
+                    // Extract the clock from the engine and give it to the visuals
+                    noteCanvas.Clock = new osu.Framework.Timing.FramedClock(activeAudioEngine.AudioClock);
+                    keyboard.Clock = new osu.Framework.Timing.FramedClock(activeAudioEngine.AudioClock);
+                    
+                    // The variable is safely passed to the keyboard here!
+                    keyboard.LoadNotes(allVisualNotes);
+                    
+                    // Give the engine to the control panel
+                    controlPanel.LinkEngine(activeAudioEngine);
+                    
+                    activeAudioEngine.Play(); 
+                });
+            });
         }
 
         private bool IsBlackKey(int pitch)

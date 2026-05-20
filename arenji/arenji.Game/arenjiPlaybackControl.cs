@@ -12,8 +12,7 @@ namespace arenji.Game
     // Updated the class name to match your new naming convention!
     public partial class arenjiPlaybackControl : FillFlowContainer, IKeyBindingHandler<ArenjiAction>
     {
-        private osu.Framework.Timing.StopwatchClock linkedClock;
-        
+        private IArenjiAudioEngine audioEngine;
         public readonly BindableDouble SeekBindable = new BindableDouble { MinValue = 0, MaxValue = 10000 };
         private BasicButton playPauseButton;
 
@@ -52,15 +51,15 @@ namespace arenji.Game
             // The slider lock trick
             SeekBindable.ValueChanged += e =>
             {
-                if (linkedClock == null || isUpdatingFromClock) return;
-                linkedClock.Seek(e.NewValue);
+                if (audioEngine == null || isUpdatingFromClock) return;
+                audioEngine.Seek(e.NewValue);
             };
         }
 
-        public void LinkClock(osu.Framework.Timing.StopwatchClock newClock, double maxSongTime)
+        public void LinkEngine(IArenjiAudioEngine newEngine)
         {
-            linkedClock = newClock;
-            SeekBindable.MaxValue = maxSongTime;
+            audioEngine = newEngine;
+            SeekBindable.MaxValue = audioEngine.DurationMs;
             SeekBindable.Value = 0;
             
             playPauseButton.Text = "Pause";
@@ -69,17 +68,18 @@ namespace arenji.Game
 
         private void TogglePlayback()
         {
-            if (linkedClock == null) return;
+            if (audioEngine == null || !audioEngine.IsReady) return;
 
-            if (linkedClock.IsRunning)
+            // Notice how clean this is now! We just talk to the interface.
+            if (audioEngine.AudioClock.IsRunning)
             {
-                linkedClock.Stop();
+                audioEngine.Pause();
                 playPauseButton.Text = "Play";
                 playPauseButton.BackgroundColour = Color4.DarkGreen;
             }
             else
             {
-                linkedClock.Start();
+                audioEngine.Play();
                 playPauseButton.Text = "Pause";
                 playPauseButton.BackgroundColour = Color4.DarkRed;
             }
@@ -89,10 +89,11 @@ namespace arenji.Game
         {
             base.Update();
 
-            if (linkedClock != null && linkedClock.IsRunning)
+            // The slider lock trick, reading from the interface's clock
+            if (audioEngine != null && audioEngine.IsReady && audioEngine.AudioClock.IsRunning)
             {
                 isUpdatingFromClock = true;                
-                SeekBindable.Value = linkedClock.CurrentTime; 
+                SeekBindable.Value = audioEngine.AudioClock.CurrentTime; 
                 isUpdatingFromClock = false;               
             }
         }
@@ -100,7 +101,7 @@ namespace arenji.Game
         // --- SHORTCUT LISTENERS ---
         public bool OnPressed(KeyBindingPressEvent<ArenjiAction> e)
         {
-            if (linkedClock == null) return false; 
+            if (audioEngine == null) return false; 
 
             switch (e.Action)
             {

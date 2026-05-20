@@ -62,7 +62,7 @@ namespace arenji.Game
             try
             {
                 var midiFile = MidiFile.Read(path);
-                Schedule(() => activeVisualizer.LoadNewMidi(midiFile));
+                Schedule(() => activeVisualizer.LoadNewMidi(path, midiFile));
             }
             catch (Exception ex)
             {

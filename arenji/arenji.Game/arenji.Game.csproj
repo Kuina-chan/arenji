@@ -7,6 +7,12 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Melanchall.DryWetMidi" Version="8.0.3" />
+    <PackageReference Include="MeltySynth" Version="2.4.1" />
     <PackageReference Include="ppy.osu.Framework" Version="2026.513.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="sf\Touhou.sf2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
