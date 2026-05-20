@@ -71,69 +71,74 @@ namespace arenji.Game
 
         public void LoadNewMidi(string midiPath, MidiFile midiFile)
         {
-            // 1. THE KILL SWITCH: Stop and destroy the old audio instantly
+            // 1. Kill any existing audio gracefully
             if (activeAudioEngine != null)
             {
                 activeAudioEngine.Pause();
                 activeAudioEngine.Dispose();
             }
 
-            // 2. Increment the ID for this specific load attempt
             int myLoadId = ++currentLoadId;
             noteCanvas.Clear();
             var tempoMap = midiFile.GetTempoMap();
-            var rawNotes = midiFile.GetNotes();
-
-            double lastNoteEndTime = 0; 
             
-            // 1. THIS IS THE MISSING VARIABLE! 
-            // We create the list here so the keyboard can use it later.
+            double lastNoteEndTime = 0; 
             var allVisualNotes = new List<VisualNoteData>();
 
-            foreach (var note in rawNotes)
+            var trackChunks = midiFile.GetTrackChunks().ToList();
+
+            for (int t = 0; t < trackChunks.Count; t++)
             {
-                double startMs = note.TimeAs<MetricTimeSpan>(tempoMap).TotalMicroseconds / 1000.0;
-                double durMs = note.LengthAs<MetricTimeSpan>(tempoMap).TotalMicroseconds / 1000.0;
+                var trackNotes = trackChunks[t].GetNotes();
                 
-                if (startMs + durMs > lastNoteEndTime)
-                    lastNoteEndTime = startMs + durMs;
-
-                var noteData = new VisualNoteData
+                foreach (var note in trackNotes)
                 {
-                    Pitch = note.NoteNumber,
-                    StartTimeMs = startMs,
-                    DurationMs = durMs,
-                    IsBlackKey = IsBlackKey(note.NoteNumber),
-                    WhiteKeyIndex = CountWhiteKeysBefore(note.NoteNumber)
-                };
+                    double startMs = note.TimeAs<MetricTimeSpan>(tempoMap).TotalMicroseconds / 1000.0;
+                    double durMs = note.LengthAs<MetricTimeSpan>(tempoMap).TotalMicroseconds / 1000.0;
+                    
+                    if (startMs + durMs > lastNoteEndTime) lastNoteEndTime = startMs + durMs;
 
-                // Add to our list for the keyboard
-                allVisualNotes.Add(noteData);
+                    // This struct is now the single source of truth for both visuals AND the keyboard
+                    var noteData = new VisualNoteData
+                    {
+                        Pitch = note.NoteNumber,
+                        StartTimeMs = startMs,
+                        DurationMs = durMs,
+                        IsBlackKey = IsBlackKey(note.NoteNumber),
+                        WhiteKeyIndex = CountWhiteKeysBefore(note.NoteNumber),
+                        
+                        TrackIndex = t,
+                        PitchClass = note.NoteNumber % 12 
+                    };
 
-                noteCanvas.Add(new DrawableMidiNote(noteData, settingsPanel));
+                    allVisualNotes.Add(noteData);
+                    noteCanvas.Add(new DrawableMidiNote(noteData, settingsPanel));
+                }
             }
 
-            // 2. Create the SoundFont engine
+            // 4. Boot up the audio engine
             activeAudioEngine = new ArenjiSoundFontEngine(osuAudioManager);
 
             Task.Run(() =>
             {
-                // CHANGE THIS TO YOUR ACTUAL SF2 PATH!
-                string mySoundFontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "sf", "Touhou.sf2");
+                // Ensure this path matches your setup!
+                string mySoundFontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "sf", "Touhou.sf2"); 
                 
-                // Tell the interface to load the files
                 activeAudioEngine.LoadFiles(midiPath, mySoundFontPath);
                 
                 Schedule(() =>
                 {
-                    // Extract the clock from the engine and give it to the visuals
+                    // Race condition preventer
+                    if (currentLoadId != myLoadId)
+                    {
+                        activeAudioEngine.Dispose();
+                        return;
+                    }
+
                     noteCanvas.Clock = new osu.Framework.Timing.FramedClock(activeAudioEngine.AudioClock);
                     keyboard.Clock = new osu.Framework.Timing.FramedClock(activeAudioEngine.AudioClock);
                     
-                    // The variable is safely passed to the keyboard here!
                     keyboard.LoadNotes(allVisualNotes);
-                    
-                    // Give the engine to the control panel
                     controlPanel.LinkEngine(activeAudioEngine);
                     
                     activeAudioEngine.Play(); 
@@ -291,30 +296,30 @@ namespace arenji.Game
             };
         }
 
+
         public void ClearNotes() => activeNotes.Clear();
         public void LoadNotes(IEnumerable<VisualNoteData> notes) => activeNotes.AddRange(notes);
 
         protected override void Update()
         {
             base.Update();
-
             bool isCurrentlyLit = false;
+            Color4 currentColor = Color4.White; // Default
             double currentTime = Clock.CurrentTime;
 
-            // Loop through all notes assigned to this specific key.
-            // If the song's current time is inside the note's duration, light it up!
             for (int i = 0; i < activeNotes.Count; i++)
             {
                 var note = activeNotes[i];
                 if (currentTime >= note.StartTimeMs && currentTime <= note.StartTimeMs + note.DurationMs)
                 {
                     isCurrentlyLit = true;
+                    // Ask the manager what color this specific key press should be!
+                    currentColor = ArenjiColorManager.GetColorForNote(note); 
                     break; 
                 }
             }
 
-            // Apply the color instantly
-            visualBox.Colour = isCurrentlyLit ? litColor : idleColor;
+            visualBox.Colour = isCurrentlyLit ? currentColor : idleColor;
         }
     }
 }

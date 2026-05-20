@@ -13,6 +13,8 @@ namespace arenji.Game
         public double DurationMs;
         public bool IsBlackKey;
         public int WhiteKeyIndex; 
+        public int TrackIndex; 
+        public int PitchClass;
     }
 
     public partial class DrawableMidiNote : CompositeDrawable
@@ -68,8 +70,6 @@ namespace arenji.Game
                 }
             };
 
-            // 5. THE MAGIC BINDINGS
-            // Whenever the slider moves, these run instantly.
             if (!data.IsBlackKey)
             {
                 settings.WhiteNoteWidth.BindValueChanged(e => Width = whiteWidth * e.NewValue, true);
@@ -87,7 +87,7 @@ namespace arenji.Game
         {
             base.Update();
             Y = (float)((Clock.CurrentTime - data.StartTimeMs) * SCROLL_SPEED);
-
+            visualBox.Colour = ArenjiColorManager.GetColorForNote(data);
             if (Y > Height) visualBox.Alpha = 0; 
             else visualBox.Alpha = 0.8f; 
         }
