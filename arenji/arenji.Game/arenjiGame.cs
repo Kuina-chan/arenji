@@ -61,8 +61,7 @@ namespace arenji.Game
             osu.Framework.Logging.Logger.Log($"Loading MIDI: {path}");
             try
             {
-                var midiFile = MidiFile.Read(path);
-                Schedule(() => activeVisualizer.LoadNewMidi(path, midiFile));
+                Schedule(() => activeVisualizer.HandleDroppedFile(path));
             }
             catch (Exception ex)
             {

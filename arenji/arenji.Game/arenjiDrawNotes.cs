@@ -15,6 +15,7 @@ namespace arenji.Game
         public int WhiteKeyIndex; 
         public int TrackIndex; 
         public int PitchClass;
+        public int ChannelIndex;
     }
 
     public partial class DrawableMidiNote : CompositeDrawable

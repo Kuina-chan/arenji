@@ -21,13 +21,12 @@ namespace arenji.Game
         private VirtualKeyboard keyboard;
         private Container noteCanvas;
         private arenjiSettings settingsPanel;
-        //private osu.Framework.Timing.StopwatchClock manualClock;
+        private arenjiAdvancedColorOverlay advancedColorOverlay;
+        private arenjiProjectPrompt projectPrompt;
         private arenjiPlaybackControl controlPanel;
         [Resolved]
         private AudioManager osuAudioManager { get; set; }
         private IArenjiAudioEngine activeAudioEngine;
-        
-        // ADD THIS LINE:
         private int currentLoadId = 0;
         [BackgroundDependencyLoader]
         private void load()
@@ -58,15 +57,51 @@ namespace arenji.Game
             { 
                 State = { Value = Visibility.Hidden } 
             };
-
+            settingsPanel = new arenjiSettings();
+            advancedColorOverlay = new arenjiAdvancedColorOverlay();
+            settingsPanel.OnRequestAdvancedColors = (mode) => advancedColorOverlay.OpenForMode(mode);
+            projectPrompt = new arenjiProjectPrompt();
             InternalChildren = new Drawable[] 
             {
                 new Box { RelativeSizeAxes = Axes.Both, Colour = new Color4(30, 30, 30, 255) },
                 noteCanvas,
                 keyboard,
                 controlPanel,
-                settingsPanel 
+                settingsPanel,
+                advancedColorOverlay,
+                projectPrompt
             };
+        }
+        
+        
+        public void HandleDroppedFile(string filePath)
+        {
+            if (filePath.EndsWith(".ini", StringComparison.OrdinalIgnoreCase))
+            {
+                string loadedMidiPath = arenjiProjectManager.LoadProject(filePath, settingsPanel);
+                
+                // Force the settings panel to visually update its buttons to match the loaded mode
+                settingsPanel.RefreshUIAfterLoad(); 
+                
+                // Load the extracted MIDI!
+                var midiFile = Melanchall.DryWetMidi.Core.MidiFile.Read(loadedMidiPath);
+                LoadNewMidi(loadedMidiPath, midiFile);
+            }
+            else if (filePath.EndsWith(".mid", StringComparison.OrdinalIgnoreCase) || filePath.EndsWith(".midi", StringComparison.OrdinalIgnoreCase))
+            {
+                // CREATE NEW PROJECT
+                projectPrompt.OnConfirm = (parentPath, projectName) =>
+                {
+                    string newIniPath = arenjiProjectManager.CreateProject(filePath, parentPath, projectName, settingsPanel);
+                    
+                    // The project is saved! Now load it from the new project folder.
+                    string targetMidi = Path.Combine(Path.GetDirectoryName(newIniPath), Path.GetFileName(filePath));
+                    var midiFile = Melanchall.DryWetMidi.Core.MidiFile.Read(targetMidi);
+                    LoadNewMidi(targetMidi, midiFile);
+                };
+                
+                projectPrompt.Show();
+            }
         }
 
         public void LoadNewMidi(string midiPath, MidiFile midiFile)
@@ -86,7 +121,7 @@ namespace arenji.Game
             var allVisualNotes = new List<VisualNoteData>();
 
             var trackChunks = midiFile.GetTrackChunks().ToList();
-
+            ArenjiColorManager.ActiveTrackCount = trackChunks.Count;
             for (int t = 0; t < trackChunks.Count; t++)
             {
                 var trackNotes = trackChunks[t].GetNotes();
@@ -108,7 +143,8 @@ namespace arenji.Game
                         WhiteKeyIndex = CountWhiteKeysBefore(note.NoteNumber),
                         
                         TrackIndex = t,
-                        PitchClass = note.NoteNumber % 12 
+                        PitchClass = note.NoteNumber % 12,
+                        ChannelIndex = note.Channel
                     };
 
                     allVisualNotes.Add(noteData);
