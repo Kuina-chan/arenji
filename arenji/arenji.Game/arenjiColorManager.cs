@@ -8,17 +8,22 @@ namespace arenji.Game
     {
         Solid,
         ByTrack,
-        ByNote
+        ByNote,
+        ByChannel
     }
 
     public static class ArenjiColorManager
     {
         public static NoteColorMode CurrentMode = NoteColorMode.Solid;
+        public static string ToHex(Color4 color)
+        {
+            return $"#{(byte)(color.R * 255):X2}{(byte)(color.G * 255):X2}{(byte)(color.B * 255):X2}{(byte)(color.A * 255):X2}"; 
+        }
         public static Color4 SolidColor = Color4.Cyan;
-        
+        public static int ActiveTrackCount = 1;
         public static Dictionary<int, Color4> TrackColors = new Dictionary<int, Color4>();
         public static Dictionary<int, Color4> NoteColors = new Dictionary<int, Color4>();
-
+        public static Dictionary<int, Color4> ChannelColors = new Dictionary<int, Color4>();
         private static readonly Color4[] defaultPalette = {
             Color4.Red, Color4.Green, Color4.Blue, Color4.Yellow, 
             Color4.Magenta, Color4.Orange, Color4.Purple, Color4.Pink
@@ -51,7 +56,11 @@ namespace arenji.Game
                     if (!NoteColors.TryGetValue(noteData.PitchClass, out finalColor))
                         finalColor = defaultPalette[noteData.PitchClass % defaultPalette.Length];
                     break;
-
+                case NoteColorMode.ByChannel:
+                    if (!ChannelColors.TryGetValue(noteData.ChannelIndex, out finalColor))
+                        finalColor = defaultPalette[noteData.ChannelIndex % defaultPalette.Length];
+                    break;
+                    
                 case NoteColorMode.Solid:
                 default:
                     finalColor = SolidColor;
