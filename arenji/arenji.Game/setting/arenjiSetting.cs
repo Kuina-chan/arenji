@@ -16,12 +16,11 @@ namespace arenji.Game
         public readonly BindableFloat WhiteNoteWidth = new BindableFloat(1.0f) { MinValue = 0.2f, MaxValue = 1.0f };
         public readonly BindableFloat BlackNoteWidth = new BindableFloat(0.6f) { MinValue = 0.1f, MaxValue = 0.8f };
         public readonly BindableFloat NoteRoundness = new BindableFloat(0f) { MinValue = 0f, MaxValue = 25f };
-
         public Action<NoteColorMode> OnRequestAdvancedColors;
-
+        public Action OnRequestImport;
         private FillFlowContainer solidSettingsGroup;
         private BasicButton advancedColorsButton;
-        private BasicButton modeCycleButton; // Added from the last step!
+        private BasicButton modeCycleButton;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -41,6 +40,15 @@ namespace arenji.Game
             {
                 RelativeSizeAxes = Axes.X, Height = 40, BackgroundColour = Color4.SteelBlue,
                 Action = () => OnRequestAdvancedColors?.Invoke(ArenjiColorManager.CurrentMode)
+            };
+
+            var importButton = new BasicButton
+            {
+                RelativeSizeAxes = Axes.X, Height = 40, 
+                Text = "Import Existing Project...", 
+                BackgroundColour = Color4.ForestGreen,
+                Margin = new MarginPadding { Bottom = 20 },
+                Action = () => OnRequestImport?.Invoke()
             };
 
             Children = new Drawable[]
@@ -67,6 +75,7 @@ namespace arenji.Game
                                 Children = new Drawable[]
                                 {
                                     new SpriteText { Text = "Visualizer Settings", Font = FrameworkFont.Regular.With(size: 24), Colour = Color4.Cyan },
+                                    importButton,
                                     createLabeledSlider("White Note Width", WhiteNoteWidth),
                                     createLabeledSlider("Black Note Width", BlackNoteWidth),
                                     createLabeledSlider("Note Roundness", NoteRoundness),

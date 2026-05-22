@@ -25,6 +25,7 @@ namespace arenji.Game
         private arenjiProjectPrompt projectPrompt;
         private arenjiPlaybackControl controlPanel;
         private arenjiLoadingOverlay loadingOverlay;
+        private arenjiImportPrompt importPrompt;
         [Resolved]
         private AudioManager osuAudioManager { get; set; }
         private IArenjiAudioEngine activeAudioEngine;
@@ -58,11 +59,30 @@ namespace arenji.Game
             { 
                 State = { Value = Visibility.Hidden } 
             };
+            
             settingsPanel = new arenjiSettings();
             advancedColorOverlay = new arenjiAdvancedColorOverlay();
             settingsPanel.OnRequestAdvancedColors = (mode) => advancedColorOverlay.OpenForMode(mode);
             projectPrompt = new arenjiProjectPrompt();
             loadingOverlay = new arenjiLoadingOverlay();
+            importPrompt = new arenjiImportPrompt();
+            settingsPanel.OnRequestImport = () => importPrompt.Show();
+            importPrompt.OnConfirm = (folderPath) =>
+            {
+                // The prompt already verified the ini exists, so we just build the path!
+                string iniPath = Path.Combine(folderPath, "project.ini");
+                
+                string loadedMidiPath = arenjiProjectManager.LoadProject(iniPath, settingsPanel);
+                settingsPanel.RefreshUIAfterLoad(); 
+
+                Melanchall.DryWetMidi.Core.MidiFile midiFile;
+                using (var stream = new FileStream(loadedMidiPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    midiFile = Melanchall.DryWetMidi.Core.MidiFile.Read(stream);
+                }
+                
+                LoadNewMidi(loadedMidiPath, midiFile);
+            };
             InternalChildren = new Drawable[] 
             {
                 new Box { RelativeSizeAxes = Axes.Both, Colour = new Color4(30, 30, 30, 255) },
@@ -72,6 +92,7 @@ namespace arenji.Game
                 settingsPanel,
                 advancedColorOverlay,
                 projectPrompt,
+                importPrompt,
                 loadingOverlay
             };
         }

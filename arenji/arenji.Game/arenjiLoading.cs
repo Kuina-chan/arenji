@@ -11,7 +11,6 @@ namespace arenji.Game
     {
         private SpriteIcon spinner;
 
-        // THE MAGIC: These two properties completely block the user from clicking or typing anything!
         protected override bool BlockPositionalInput => true;
         protected override bool BlockNonPositionalInput => true;
 
