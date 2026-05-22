@@ -24,6 +24,7 @@ namespace arenji.Game
         private arenjiAdvancedColorOverlay advancedColorOverlay;
         private arenjiProjectPrompt projectPrompt;
         private arenjiPlaybackControl controlPanel;
+        private arenjiLoadingOverlay loadingOverlay;
         [Resolved]
         private AudioManager osuAudioManager { get; set; }
         private IArenjiAudioEngine activeAudioEngine;
@@ -61,6 +62,7 @@ namespace arenji.Game
             advancedColorOverlay = new arenjiAdvancedColorOverlay();
             settingsPanel.OnRequestAdvancedColors = (mode) => advancedColorOverlay.OpenForMode(mode);
             projectPrompt = new arenjiProjectPrompt();
+            loadingOverlay = new arenjiLoadingOverlay();
             InternalChildren = new Drawable[] 
             {
                 new Box { RelativeSizeAxes = Axes.Both, Colour = new Color4(30, 30, 30, 255) },
@@ -69,7 +71,8 @@ namespace arenji.Game
                 controlPanel,
                 settingsPanel,
                 advancedColorOverlay,
-                projectPrompt
+                projectPrompt,
+                loadingOverlay
             };
         }
         
@@ -78,13 +81,17 @@ namespace arenji.Game
         {
             if (filePath.EndsWith(".ini", StringComparison.OrdinalIgnoreCase))
             {
+                // LOAD EXISTING PROJECT
                 string loadedMidiPath = arenjiProjectManager.LoadProject(filePath, settingsPanel);
-                
-                // Force the settings panel to visually update its buttons to match the loaded mode
                 settingsPanel.RefreshUIAfterLoad(); 
+
+                // THE FIX: Safe FileStream reading!
+                Melanchall.DryWetMidi.Core.MidiFile midiFile;
+                using (var stream = new FileStream(loadedMidiPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    midiFile = Melanchall.DryWetMidi.Core.MidiFile.Read(stream);
+                }
                 
-                // Load the extracted MIDI!
-                var midiFile = Melanchall.DryWetMidi.Core.MidiFile.Read(loadedMidiPath);
                 LoadNewMidi(loadedMidiPath, midiFile);
             }
             else if (filePath.EndsWith(".mid", StringComparison.OrdinalIgnoreCase) || filePath.EndsWith(".midi", StringComparison.OrdinalIgnoreCase))
@@ -93,10 +100,15 @@ namespace arenji.Game
                 projectPrompt.OnConfirm = (parentPath, projectName) =>
                 {
                     string newIniPath = arenjiProjectManager.CreateProject(filePath, parentPath, projectName, settingsPanel);
-                    
-                    // The project is saved! Now load it from the new project folder.
                     string targetMidi = Path.Combine(Path.GetDirectoryName(newIniPath), Path.GetFileName(filePath));
-                    var midiFile = Melanchall.DryWetMidi.Core.MidiFile.Read(targetMidi);
+                    
+                    // THE FIX: Safe FileStream reading!
+                    Melanchall.DryWetMidi.Core.MidiFile midiFile;
+                    using (var stream = new FileStream(targetMidi, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    {
+                        midiFile = Melanchall.DryWetMidi.Core.MidiFile.Read(stream);
+                    }
+                    
                     LoadNewMidi(targetMidi, midiFile);
                 };
                 
@@ -128,6 +140,10 @@ namespace arenji.Game
                 
                 foreach (var note in trackNotes)
                 {
+                    if (note.NoteNumber < 21 || note.NoteNumber > 108)
+                    {
+                        continue;
+                    }
                     double startMs = note.TimeAs<MetricTimeSpan>(tempoMap).TotalMicroseconds / 1000.0;
                     double durMs = note.LengthAs<MetricTimeSpan>(tempoMap).TotalMicroseconds / 1000.0;
                     
@@ -152,33 +168,51 @@ namespace arenji.Game
                 }
             }
 
-            // 4. Boot up the audio engine
+            noteCanvas.Clock = new osu.Framework.Timing.FramedClock(new osu.Framework.Timing.ManualClock());
+            keyboard.Clock = new osu.Framework.Timing.FramedClock(new osu.Framework.Timing.ManualClock());
+
+            // 2. SHOW THE LOADING SCREEN! (This blocks the user instantly)
+            loadingOverlay.Show(); 
+
             activeAudioEngine = new ArenjiSoundFontEngine(osuAudioManager);
 
             Task.Run(() =>
             {
-                // Ensure this path matches your setup!
-                string mySoundFontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "sf", "Touhou.sf2"); 
-                
-                activeAudioEngine.LoadFiles(midiPath, mySoundFontPath);
-                
-                Schedule(() =>
+                try
                 {
-                    // Race condition preventer
-                    if (currentLoadId != myLoadId)
+                    string mySoundFontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "sf", "Touhou.sf2"); 
+                    activeAudioEngine.LoadFiles(midiPath, mySoundFontPath);
+                    
+                    Schedule(() =>
                     {
-                        activeAudioEngine.Dispose();
-                        return;
-                    }
+                        if (currentLoadId != myLoadId)
+                        {
+                            activeAudioEngine.Dispose();
+                            loadingOverlay.Hide(); // Prevent soft-locks
+                            return;
+                        }
 
-                    noteCanvas.Clock = new osu.Framework.Timing.FramedClock(activeAudioEngine.AudioClock);
-                    keyboard.Clock = new osu.Framework.Timing.FramedClock(activeAudioEngine.AudioClock);
-                    
-                    keyboard.LoadNotes(allVisualNotes);
-                    controlPanel.LinkEngine(activeAudioEngine);
-                    
-                    activeAudioEngine.Play(); 
-                });
+                        noteCanvas.Clock = new osu.Framework.Timing.FramedClock(activeAudioEngine.AudioClock);
+                        keyboard.Clock = new osu.Framework.Timing.FramedClock(activeAudioEngine.AudioClock);
+                        
+                        keyboard.LoadNotes(allVisualNotes);
+                        controlPanel.LinkEngine(activeAudioEngine);
+                        
+                        activeAudioEngine.Play(); 
+                        
+                        // 3. HIDE THE LOADING SCREEN! (The song is now perfectly loaded and playing)
+                        loadingOverlay.Hide(); 
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Schedule(() => 
+                    {
+                        // If the engine crashes, hide the loading screen so the user isn't stuck forever!
+                        loadingOverlay.Hide();
+                        osu.Framework.Logging.Logger.Log($"AUDIO ENGINE CRASH: {ex.Message}", osu.Framework.Logging.LoggingTarget.Runtime, osu.Framework.Logging.LogLevel.Error);
+                    });
+                }
             });
         }
 
