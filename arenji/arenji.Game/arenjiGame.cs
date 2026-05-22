@@ -4,8 +4,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
-using Melanchall.DryWetMidi.Core;
-using Melanchall.DryWetMidi.Interaction;
 
 namespace arenji.Game
 {
@@ -45,20 +43,20 @@ namespace arenji.Game
         {
             base.LoadComplete();
             string initialMidi = launchArguments.FirstOrDefault(arg => arg.EndsWith(".mid", StringComparison.OrdinalIgnoreCase));
-            if (initialMidi != null) processMidiFile(initialMidi);
+            if (initialMidi != null) processFile(initialMidi);
         }
 
         private void handleDragDrop(string filePath)
         {
             if (filePath.EndsWith(".mid", StringComparison.OrdinalIgnoreCase))
             {
-                Schedule(() => processMidiFile(filePath));
+                Schedule(() => processFile(filePath));
             }
         }
 
-        private void processMidiFile(string path)
+        private void processFile(string path)
         {
-            osu.Framework.Logging.Logger.Log($"Loading MIDI: {path}");
+            //osu.Framework.Logging.Logger.Log($"Loading MIDI: {path}");
             try
             {
                 Schedule(() => activeVisualizer.HandleDroppedFile(path));
