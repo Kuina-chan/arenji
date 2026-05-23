@@ -1,6 +1,7 @@
 using osuTK.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Threading.Channels;
 
 namespace arenji.Game
 {
@@ -104,6 +105,33 @@ namespace arenji.Game
             }
 
             return fallback;
+        }
+
+        public static void InitializeDefaults(int TrackCount)
+        {
+            for (int i = 0; i < TrackCount; i++)
+            {
+                if (!TrackColors.ContainsKey(i))
+                {
+                    TrackColors[i] = defaultPalette[i % defaultPalette.Length];
+                }
+            }
+
+            for (int i = 0; i < 12; i++)
+            {
+                if (!NoteColors.ContainsKey(i))
+                {
+                    NoteColors[i] = defaultPalette[i % defaultPalette.Length];
+                }
+            }
+
+            for (int i = 0; i < 12; i++)
+            {
+                if (!ChannelColors.ContainsKey(i))
+                {
+                    ChannelColors[i] = defaultPalette[i % defaultPalette.Length];
+                }
+            }
         }
     }
 }

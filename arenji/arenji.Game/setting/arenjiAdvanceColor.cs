@@ -140,7 +140,7 @@ namespace arenji.Game
             // 1. Build the square FIRST so the compiler knows it exists!
             var previewSquare = new Box { Width = 30, Height = 30, Colour = initialColor };
 
-            var textBox = new BasicTextBox { Width = 200, Height = 30, PlaceholderText = "Hex or RGB" };
+            var textBox = new BasicTextBox { Width = 200, Height = 30, PlaceholderText = "Hex or RGB", Text = ArenjiColorManager.ToHex(initialColor) };
             
             // 2. Now the text box can safely talk to the square
             textBox.Current.ValueChanged += e => 
@@ -165,7 +165,7 @@ namespace arenji.Game
                     {
                         new SpriteText { Text = label, Anchor = Anchor.CentreLeft, Origin = Anchor.CentreLeft },
                         textBox,
-                        previewSquare // 3. Drop the pre-built square right into the UI!
+                        previewSquare
                     }
                 }
             };

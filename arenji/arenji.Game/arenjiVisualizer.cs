@@ -155,6 +155,7 @@ namespace arenji.Game
 
             var trackChunks = midiFile.GetTrackChunks().ToList();
             ArenjiColorManager.ActiveTrackCount = trackChunks.Count;
+            ArenjiColorManager.InitializeDefaults(trackChunks.Count);
             for (int t = 0; t < trackChunks.Count; t++)
             {
                 var trackNotes = trackChunks[t].GetNotes();
@@ -170,7 +171,6 @@ namespace arenji.Game
                     
                     if (startMs + durMs > lastNoteEndTime) lastNoteEndTime = startMs + durMs;
 
-                    // This struct is now the single source of truth for both visuals AND the keyboard
                     var noteData = new VisualNoteData
                     {
                         Pitch = note.NoteNumber,
@@ -221,7 +221,6 @@ namespace arenji.Game
                         
                         activeAudioEngine.Play(); 
                         
-                        // 3. HIDE THE LOADING SCREEN! (The song is now perfectly loaded and playing)
                         loadingOverlay.Hide(); 
                     });
                 }
