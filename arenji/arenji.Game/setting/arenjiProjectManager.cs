@@ -10,6 +10,11 @@ namespace arenji.Game
         // 1. Remember the active project folder!
         public static string CurrentProjectFolder = string.Empty;
         public static string CurrentMidiFileName = string.Empty;
+        public static string CurrentBackgroundPath = string.Empty;
+        public static void SetBackgroundPath(string absolutePath)
+        {
+            CurrentBackgroundPath = absolutePath;
+        }
 
         // 2. THE NEW AUTO-SAVE METHOD
         public static void SaveCurrentProject(arenjiSettings settingsPanel)
@@ -22,11 +27,19 @@ namespace arenji.Game
             {
                 "[General]",
                 $"MidiFile={CurrentMidiFileName}",
+                "",
+                "[Note Setting]",
                 $"WhiteNoteWidth={settingsPanel.WhiteNoteWidth.Value}",
-                $"BlackNoteWidth={settingsPanel.BlackNoteWidth.Value}",
                 $"NoteRoundness={settingsPanel.NoteRoundness.Value}",
+                $"NoteOpacity={settingsPanel.NoteOpacity.Value}",
                 $"ColorMode={ArenjiColorManager.CurrentMode}",
                 $"SolidColor={ArenjiColorManager.ToHex(ArenjiColorManager.SolidColor)}",
+                "",
+                "[Background Setting]",
+                $"BackgroundFile={CurrentBackgroundPath}",
+                $"BlackNoteWidth={settingsPanel.BlackNoteWidth.Value}",
+                $"BackgroundOpacity={settingsPanel.BackgroundOpacity.Value}",
+                $"BackgroundOffset={settingsPanel.BackgroundOffset.Value}",
                 "",
                 "[TrackColors]"
             };
@@ -59,6 +72,24 @@ namespace arenji.Game
             return Path.Combine(CurrentProjectFolder, "project.ini");
         }
 
+        public static string ImportBackground(string sourceFilePath)
+        {
+            if (string.IsNullOrEmpty(CurrentProjectFolder)) return string.Empty;
+
+            string bgDir = Path.Combine(CurrentProjectFolder, "bg");
+            Directory.CreateDirectory(bgDir);
+
+            string safeName = Path.GetFileName(sourceFilePath);
+            string destPath = Path.Combine(bgDir, safeName);
+            
+            // Copy it so it travels with the project!
+            if (!File.Exists(destPath) || sourceFilePath != destPath)
+                File.Copy(sourceFilePath, destPath, true);
+
+            CurrentBackgroundPath = safeName;
+            return safeName; // Return just the relative name
+        }
+
         public static string LoadProject(string iniPath, arenjiSettings settingsPanel)
         {
             CurrentProjectFolder = Path.GetDirectoryName(iniPath);
@@ -67,7 +98,8 @@ namespace arenji.Game
 
             ArenjiColorManager.TrackColors.Clear();
             ArenjiColorManager.NoteColors.Clear();
-            ArenjiColorManager.ChannelColors.Clear(); // Clear old channels!
+            ArenjiColorManager.ChannelColors.Clear();
+            
 
             foreach (string rawLine in lines)
             {
@@ -81,13 +113,34 @@ namespace arenji.Game
 
                 if (currentSection == "[General]")
                 {
-                    if (key == "MidiFile") CurrentMidiFileName = value;
-                    else if (key == "WhiteNoteWidth") settingsPanel.WhiteNoteWidth.Value = float.Parse(value);
+                    if (key == "MidiFile") CurrentMidiFileName = value;      
+                }
+
+                else if (currentSection == "[Note Setting]")
+                {
+                    if (key == "WhiteNoteWidth") settingsPanel.WhiteNoteWidth.Value = float.Parse(value);
                     else if (key == "BlackNoteWidth") settingsPanel.BlackNoteWidth.Value = float.Parse(value);
                     else if (key == "NoteRoundness") settingsPanel.NoteRoundness.Value = float.Parse(value);
+                    else if (key == "NoteOpacity")
+                    {
+                        float parsedOpacity = float.Parse(value);
+                        settingsPanel.NoteOpacity.Value = parsedOpacity;
+                        ArenjiColorManager.GlobalOpacity = parsedOpacity;
+                    }
                     else if (key == "ColorMode") Enum.TryParse(value, out ArenjiColorManager.CurrentMode);
                     else if (key == "SolidColor") ArenjiColorManager.SolidColor = ArenjiColorManager.ParseString(value, Color4.Cyan);
                 }
+
+                else if (currentSection == "[Background Setting]")
+                {
+                    if (key == "BackgroundPath") CurrentBackgroundPath = value; 
+                    else if (key == "BackgroundOffset") settingsPanel.BackgroundOffset.Value = float.Parse(value);              
+                    else if (key == "BackgroundOpacity")
+                    {
+                        settingsPanel.BackgroundOpacity.Value = float.Parse(value);
+                    }
+                }
+                
                 else if (currentSection == "[TrackColors]" && int.TryParse(key, out int tId))
                     ArenjiColorManager.TrackColors[tId] = ArenjiColorManager.ParseString(value, Color4.White);
                 else if (currentSection == "[NoteColors]" && int.TryParse(key, out int nId))

@@ -15,8 +15,12 @@ namespace arenji.Game
     {
         public readonly BindableFloat WhiteNoteWidth = new BindableFloat(1.0f) { MinValue = 0.2f, MaxValue = 1.0f };
         public readonly BindableFloat BlackNoteWidth = new BindableFloat(0.6f) { MinValue = 0.1f, MaxValue = 0.8f };
-        public readonly BindableFloat NoteRoundness = new BindableFloat(0f) { MinValue = 0f, MaxValue = 25f };
+        public readonly BindableFloat NoteRoundness = new BindableFloat(0.5f) { MinValue = 0f, MaxValue = 20f };
+        public readonly BindableFloat NoteOpacity = new BindableFloat(1.0f) { MinValue = 0f, MaxValue = 1.0f};
+        public readonly BindableFloat BackgroundOpacity = new BindableFloat(1.0f) { MinValue = 0f, MaxValue = 1.0f};
+        public readonly BindableFloat BackgroundOffset = new BindableFloat(0f) { MinValue = -5000f, MaxValue = 5000f };
         public Action<NoteColorMode> OnRequestAdvancedColors;
+        public Action OnRequestBackgroundChange;
         public Action OnRequestImport;
         private FillFlowContainer solidSettingsGroup;
         private BasicButton advancedColorsButton;
@@ -51,6 +55,16 @@ namespace arenji.Game
                 Action = () => OnRequestImport?.Invoke()
             };
 
+            var BackgroundImport = new BasicButton
+            {
+                RelativeSizeAxes = Axes.X, Height = 40, 
+                Text = "Change Background...", 
+                BackgroundColour = Color4.MediumPurple,
+                Margin = new MarginPadding { Bottom = 20 },
+                Action = () => OnRequestBackgroundChange?.Invoke()
+            };
+
+            
             Children = new Drawable[]
             {
                 new Box { RelativeSizeAxes = Axes.Both, Colour = Color4.Black, Alpha = 0.7f },
@@ -76,18 +90,26 @@ namespace arenji.Game
                                 {
                                     new SpriteText { Text = "Visualizer Settings", Font = FrameworkFont.Regular.With(size: 24), Colour = Color4.Cyan },
                                     importButton,
+                                    BackgroundImport,
                                     createLabeledSlider("White Note Width", WhiteNoteWidth),
                                     createLabeledSlider("Black Note Width", BlackNoteWidth),
                                     createLabeledSlider("Note Roundness", NoteRoundness),
-
+                                    createLabeledSlider("Note Opacity", NoteOpacity),
+                                    new SpriteText
+                                    {
+                                        Text = "Background Setting",
+                                        Font = FrameworkFont.Regular.With(size: 24), 
+                                        Colour = Color4.Cyan,
+                                    },
+                                    createLabeledSlider("Background Opacity", BackgroundOpacity),
+                                    createLabeledSlider("Background Offset (ms)", BackgroundOffset),
                                     new SpriteText 
                                     { 
                                         Text = "Color Settings", 
                                         Font = FrameworkFont.Regular.With(size: 24), Colour = Color4.Cyan,
                                         Margin = new MarginPadding { Top = 20 } 
                                     },
-                                    
-                                    createModeCycleButton(), // <-- Called right here!
+                                    createModeCycleButton(),
                                     solidSettingsGroup,
                                     advancedColorsButton
                                 }
