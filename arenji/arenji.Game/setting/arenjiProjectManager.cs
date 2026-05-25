@@ -11,6 +11,7 @@ namespace arenji.Game
         public static string CurrentProjectFolder = string.Empty;
         public static string CurrentMidiFileName = string.Empty;
         public static string CurrentBackgroundPath = string.Empty;
+        public static string CurrentBackingAudioPath = string.Empty;
         public static void SetBackgroundPath(string absolutePath)
         {
             CurrentBackgroundPath = absolutePath;
@@ -35,6 +36,13 @@ namespace arenji.Game
                 $"ColorMode={ArenjiColorManager.CurrentMode}",
                 $"SolidColor={ArenjiColorManager.ToHex(ArenjiColorManager.SolidColor)}",
                 $"BlackNoteWidth={settingsPanel.BlackNoteWidth.Value}",
+                "",
+                "[Audio Setting]",
+                $"BackingAudioPath={CurrentBackingAudioPath}",
+                $"SoundfontVolume={settingsPanel.SoundFontVolume.Value}",
+                $"BackingAudioVolume={settingsPanel.BackingAudioVolume.Value}",
+                $"MuteSoundfont={settingsPanel.MuteSoundfont.Value}",
+                $"MuteBackingAudio={settingsPanel.MuteBackingAudio.Value}",
                 "",
                 "[Background Setting]",
                 $"BackgroundFile={CurrentBackgroundPath}",
@@ -90,6 +98,26 @@ namespace arenji.Game
             return safeName; // Return just the relative name
         }
 
+        public static string ImportBackingAudio(string sourceFilePath)
+        {
+            if (string.IsNullOrEmpty(CurrentProjectFolder) || string.IsNullOrEmpty(sourceFilePath)) 
+                return string.Empty;
+
+            // Create an "audio" folder inside the project
+            string audioDir = Path.Combine(CurrentProjectFolder, "audio");
+            Directory.CreateDirectory(audioDir);
+
+            string safeName = Path.GetFileName(sourceFilePath);
+            string destPath = Path.Combine(audioDir, safeName);
+            
+            // Copy the file so it travels with the project!
+            if (!File.Exists(destPath) || sourceFilePath != destPath)
+                File.Copy(sourceFilePath, destPath, true);
+
+            CurrentBackingAudioPath = destPath;
+            return destPath; 
+        }
+
         public static string LoadProject(string iniPath, arenjiSettings settingsPanel)
         {
             CurrentProjectFolder = Path.GetDirectoryName(iniPath);
@@ -139,6 +167,15 @@ namespace arenji.Game
                     {
                         settingsPanel.BackgroundOpacity.Value = float.Parse(value);
                     }
+                }
+
+                else if (currentSection == "[Audio Setting]")
+                {
+                    if (key == "BackingAudioPath") CurrentBackingAudioPath = value;
+                    else if (key == "SoundfontVolume") settingsPanel.SoundFontVolume.Value = float.Parse(value);
+                    else if (key == "BackingAudioVolume") settingsPanel.BackingAudioVolume.Value = float.Parse(value);
+                    else if (key == "MuteSoundfont") settingsPanel.MuteSoundfont.Value = bool.Parse(value);
+                    else if (key == "MuteBackingAudio") settingsPanel.MuteBackingAudio.Value = bool.Parse(value);
                 }
                 
                 else if (currentSection == "[TrackColors]" && int.TryParse(key, out int tId))

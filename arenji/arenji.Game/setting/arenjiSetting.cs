@@ -5,6 +5,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osuTK.Graphics;
 using osuTK;
 using System;
@@ -16,15 +17,34 @@ namespace arenji.Game
         public readonly BindableFloat WhiteNoteWidth = new BindableFloat(1.0f) { MinValue = 0.2f, MaxValue = 1.0f };
         public readonly BindableFloat BlackNoteWidth = new BindableFloat(0.6f) { MinValue = 0.1f, MaxValue = 0.8f };
         public readonly BindableFloat NoteRoundness = new BindableFloat(0.5f) { MinValue = 0f, MaxValue = 20f };
-        public readonly BindableFloat NoteOpacity = new BindableFloat(1.0f) { MinValue = 0f, MaxValue = 1.0f};
-        public readonly BindableFloat BackgroundOpacity = new BindableFloat(1.0f) { MinValue = 0f, MaxValue = 1.0f};
+        public readonly BindableFloat NoteOpacity = new BindableFloat(1.0f) { MinValue = 0f, MaxValue = 1.0f };
+        public readonly BindableFloat BackgroundOpacity = new BindableFloat(1.0f) { MinValue = 0f, MaxValue = 1.0f };
         public readonly BindableFloat BackgroundOffset = new BindableFloat(0f) { MinValue = -10f, MaxValue = 10f };
+        public readonly BindableFloat SoundFontVolume = new BindableFloat(0f) { MinValue = 0f, MaxValue = 1.0f };
+        public readonly BindableFloat BackingAudioVolume = new BindableFloat(0f) { MinValue = 0f, MaxValue = 1.0f };
+        public readonly BindableBool MuteSoundfont = new BindableBool(false);
+        public readonly BindableBool MuteBackingAudio = new BindableBool(false);
+        public Action OnRequestAudioImport;
+        
         public Action<NoteColorMode> OnRequestAdvancedColors;
         public Action OnRequestBackgroundChange;
         public Action OnRequestImport;
+        
         private FillFlowContainer solidSettingsGroup;
         private BasicButton advancedColorsButton;
         private BasicButton modeCycleButton;
+
+        // Allows the user to press Escape to close the panel
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Key == osuTK.Input.Key.Escape && State.Value == Visibility.Visible)
+            {
+                Hide(); 
+                return true;
+            }
+            
+            return base.OnKeyDown(e);
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -64,16 +84,40 @@ namespace arenji.Game
                 Action = () => OnRequestBackgroundChange?.Invoke()
             };
 
-            
+            SoundFontVolume.BindValueChanged(e => 
+            {
+                if (e.NewValue <= 0f) MuteSoundfont.Value = true;
+                else if (e.NewValue > 0f && MuteSoundfont.Value) MuteSoundfont.Value = false;
+            });
+            BackingAudioVolume.BindValueChanged(e => 
+            {
+                if (e.NewValue <= 0f) MuteBackingAudio.Value = true;
+                else if (e.NewValue > 0f && MuteBackingAudio.Value) MuteBackingAudio.Value = false;
+            });
+
+            MuteSoundfont.BindValueChanged(e => 
+            {
+                if (!e.NewValue) MuteBackingAudio.Value = true;
+            });
+
+            MuteBackingAudio.BindValueChanged(e => 
+            {
+                if (!e.NewValue) MuteSoundfont.Value = true;
+            });
             Children = new Drawable[]
             {
-                new Box { RelativeSizeAxes = Axes.Both, Colour = Color4.Black, Alpha = 0.7f },
-                
-                new Container
+                new ClickableContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Action = Hide,
+                    Child = new Box { RelativeSizeAxes = Axes.Both, Colour = Color4.Black, Alpha = 0.7f }
+                },
+                new ClickableContainer
                 {
                     Anchor = Anchor.Centre, Origin = Anchor.Centre,
                     Width = 500, AutoSizeAxes = Axes.Y,
                     Masking = true, CornerRadius = 15,
+                    Action = () => { }, // Empty action eats the click safely!
                     Children = new Drawable[]
                     {
                         new Box { RelativeSizeAxes = Axes.Both, Colour = new Color4(40, 40, 40, 255) },
@@ -88,9 +132,9 @@ namespace arenji.Game
                                 Padding = new MarginPadding(30), Spacing = new Vector2(0, 20),
                                 Children = new Drawable[]
                                 {
-                                    new SpriteText { Text = "Visualizer Settings", Font = FrameworkFont.Regular.With(size: 24), Colour = Color4.Cyan },
                                     importButton,
-                                    BackgroundImport,
+
+                                    new SpriteText { Text = "Visualizer Settings", Font = FrameworkFont.Regular.With(size: 24), Colour = Color4.Cyan },
                                     createLabeledSlider("White Note Width", WhiteNoteWidth),
                                     createLabeledSlider("Black Note Width", BlackNoteWidth),
                                     createLabeledSlider("Note Roundness", NoteRoundness),
@@ -101,8 +145,20 @@ namespace arenji.Game
                                         Font = FrameworkFont.Regular.With(size: 24), 
                                         Colour = Color4.Cyan,
                                     },
+                                    BackgroundImport,
                                     createLabeledSlider("Background Opacity", BackgroundOpacity),
                                     createLabeledSlider("Background Offset (s)", BackgroundOffset),
+                                    new SpriteText { Text = "Audio Settings", Font = FrameworkFont.Regular.With(size: 24), Colour = Color4.Cyan, Margin = new MarginPadding { Top = 20, Bottom = 5 } },
+                                    new BasicButton
+                                    {
+                                        RelativeSizeAxes = Axes.X, Height = 40, Text = "Import Backing Audio...", 
+                                        BackgroundColour = Color4.MediumSeaGreen, Margin = new MarginPadding { Bottom = 10 },
+                                        Action = () => OnRequestAudioImport?.Invoke()
+                                    },
+                                    createToggleButton("Soundfont (MIDI)", MuteSoundfont),
+                                    createLabeledSlider("Soundfont Volume", SoundFontVolume),
+                                    createToggleButton("Backing Audio", MuteBackingAudio),
+                                    createLabeledSlider("Backing Volume", BackingAudioVolume),
                                     new SpriteText 
                                     { 
                                         Text = "Color Settings", 
@@ -126,8 +182,6 @@ namespace arenji.Game
         {
             updateGroupVisibility();
         }
-
-        // --- PLACE YOUR UPDATED METHODS HERE ---
 
         private void updateGroupVisibility()
         {
@@ -166,55 +220,44 @@ namespace arenji.Game
             return modeCycleButton;
         }
 
-        // --- YOUR EXISTING HELPERS ---
-
         private Drawable createLabeledSlider(string labelText, BindableFloat bindable)
         {
             var textBox = new BasicTextBox
             {
                 Width = 70,
                 Height = 30,
-                // Default the text to the current value
                 Text = bindable.Value.ToString("0.00")
             };
 
             var slider = new BasicSliderBar<float>
             {
                 RelativeSizeAxes = Axes.X,
-                Width = 0.75f, // Take up 75% of the width, leaving room for the text box
-                Height = 30,
+                Width = 0.75f, 
+                Height = 15,
                 Current = bindable
             };
 
-            // 1. When the user TYPES, update the slider
             textBox.Current.ValueChanged += e =>
             {
-                // TryParse prevents the game from crashing if they type letters instead of numbers!
                 if (float.TryParse(e.NewValue, out float parsed))
                 {
-                    // The BindableFloat will automatically clamp this value to your Min/Max settings
                     bindable.Value = parsed; 
                 }
             };
 
-            // When the user presses ENTER or clicks away, reformat the text nicely
             textBox.OnCommit += (sender, isNew) =>
             {
                 textBox.Text = bindable.Value.ToString("0.00");
             };
 
-            // 2. When the SLIDER moves, update the text box
             bindable.BindValueChanged(e =>
             {
-                // We only update the text if the user isn't actively typing in it.
-                // Otherwise, the text box fights their cursor!
                 if (!textBox.HasFocus)
                 {
                     textBox.Text = e.NewValue.ToString("0.00");
                 }
-            }, true); // "true" forces it to run once immediately upon creation
+            }, true); 
 
-            // 3. Build the UI Row
             return new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -257,11 +300,28 @@ namespace arenji.Game
             };
         }
 
+        private Drawable createToggleButton(string label, BindableBool bindable)
+        {
+            var button = new BasicButton { RelativeSizeAxes = Axes.X, Height = 40 };
+
+            // Update visuals when the bindable changes
+            bindable.BindValueChanged(e =>
+            {
+                button.Text = label + (e.NewValue ? " [MUTED]" : " [ON]");
+                button.BackgroundColour = e.NewValue ? Color4.DarkRed : Color4.DarkGreen;
+            }, true);
+
+            button.Action = () => bindable.Toggle();
+            return button;
+        }
+
         protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);
         protected override void PopOut() 
         {
             this.FadeOut(200, Easing.OutQuint);
             arenjiProjectManager.SaveCurrentProject(this);
         }
+
+        
     }
 }

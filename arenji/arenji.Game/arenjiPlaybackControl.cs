@@ -6,13 +6,17 @@ using osu.Framework.Graphics.UserInterface;
 using osuTK.Graphics;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Audio.Track;
 
 namespace arenji.Game
 {
-    // Updated the class name to match your new naming convention!
     public partial class arenjiPlaybackControl : FillFlowContainer, IKeyBindingHandler<ArenjiAction>
     {
         private IArenjiAudioEngine audioEngine;
+        
+        // THE NEW ADDITION: Hold a reference to the secondary backing track!
+        private Track backingTrack; 
+        
         public readonly BindableDouble SeekBindable = new BindableDouble { MinValue = 0, MaxValue = 10000 };
         private BasicButton playPauseButton;
 
@@ -48,11 +52,13 @@ namespace arenji.Game
                 }
             };
 
-            // The slider lock trick
+            // THE FIX: Seek BOTH engines when the user drags the slider!
             SeekBindable.ValueChanged += e =>
             {
                 if (audioEngine == null || isUpdatingFromClock) return;
+                
                 audioEngine.Seek(e.NewValue);
+                backingTrack?.Seek(e.NewValue); 
             };
         }
 
@@ -66,20 +72,30 @@ namespace arenji.Game
             playPauseButton.BackgroundColour = Color4.DarkRed;
         }
 
+        // THE NEW METHOD: Allows the visualizer to hand over the backing track
+        public void LinkBackingTrack(Track track)
+        {
+            backingTrack = track;
+        }
+
         private void TogglePlayback()
         {
             if (audioEngine == null || !audioEngine.IsReady) return;
 
-            // Notice how clean this is now! We just talk to the interface.
+            // THE FIX: Pause and Play BOTH engines simultaneously!
             if (audioEngine.AudioClock.IsRunning)
             {
                 audioEngine.Pause();
+                backingTrack?.Stop(); 
+                
                 playPauseButton.Text = "Play";
                 playPauseButton.BackgroundColour = Color4.DarkGreen;
             }
             else
             {
                 audioEngine.Play();
+                backingTrack?.Start(); 
+                
                 playPauseButton.Text = "Pause";
                 playPauseButton.BackgroundColour = Color4.DarkRed;
             }
@@ -89,7 +105,6 @@ namespace arenji.Game
         {
             base.Update();
 
-            // The slider lock trick, reading from the interface's clock
             if (audioEngine != null && audioEngine.IsReady && audioEngine.AudioClock.IsRunning)
             {
                 isUpdatingFromClock = true;                
@@ -98,7 +113,6 @@ namespace arenji.Game
             }
         }
 
-        // --- SHORTCUT LISTENERS ---
         public bool OnPressed(KeyBindingPressEvent<ArenjiAction> e)
         {
             if (audioEngine == null) return false; 

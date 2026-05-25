@@ -17,5 +17,6 @@ namespace arenji.Game
         void Pause();
         void Seek(double timeMs);
         void Dispose();
+        double Volume {get; set;}
     }
 }

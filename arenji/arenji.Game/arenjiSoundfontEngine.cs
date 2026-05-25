@@ -23,7 +23,6 @@ namespace arenji.Game
         public void Dispose() { }
     }
 
-    // The Interface Implementation!
     public class ArenjiSoundFontEngine : IArenjiAudioEngine
     {
         private readonly AudioManager audioManager;
@@ -32,6 +31,22 @@ namespace arenji.Game
         public IClock AudioClock => internalTrack; // The track acts as our clock!
         public double DurationMs => internalTrack?.Length ?? 0;
         public bool IsReady => internalTrack != null && internalTrack.IsLoaded;
+        private double _volume = 1.0; 
+        
+        public double Volume
+        {
+            get => _volume;
+            set
+            {
+                _volume = value;
+                
+                // If a track is currently loaded and playing, instantly update its volume!
+                if (internalTrack != null)
+                {
+                    internalTrack.Volume.Value = _volume;
+                }
+            }
+        }
 
         public ArenjiSoundFontEngine(AudioManager manager)
         {
@@ -40,15 +55,16 @@ namespace arenji.Game
 
         public void LoadFiles(string midiPath, string instrumentPath)
         {
-            // Clean up the old track if we load a new one
             Dispose();
 
-            // Render the audio in RAM
             var wavBytes = renderMidiToWavBytes(midiPath, instrumentPath);
             
-            // Load it into the framework
             var trackStore = audioManager.GetTrackStore(new MemoryAudioStore(wavBytes));
             internalTrack = trackStore.Get("audio");
+            if (internalTrack != null)
+            {
+                internalTrack.Volume.Value = _volume;
+            }
         }
 
         public void Play() => internalTrack?.Start();
@@ -62,7 +78,6 @@ namespace arenji.Game
             internalTrack = null;
         }
 
-        // --- The MeltySynth logic remains untouched down here ---
         private byte[] renderMidiToWavBytes(string midiPath, string sf2Path)
         {
             int sampleRate = 44100;

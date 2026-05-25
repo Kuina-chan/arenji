@@ -35,11 +35,29 @@ namespace arenji.Game
         private IArenjiAudioEngine activeAudioEngine;
         private int currentLoadId = 0;
         private osu.Framework.Timing.OffsetClock backgroundClock;
+        private arenjiAudioSelector audioSelector;
+        private osu.Framework.Audio.Track.Track backingTrack;
         [osu.Framework.Allocation.Resolved]
         private AudioManager osuAudioManager { get; set; }
         [osu.Framework.Allocation.Resolved]
         private osu.Framework.Platform.GameHost host { get; set; }
-        [BackgroundDependencyLoader]
+        [osu.Framework.Allocation.Resolved]
+        private AudioManager globalAudioManager { get; set; }
+        private void applyMasterVolumes()
+        {
+            // Apply Soundfont Volume
+            if (activeAudioEngine != null)
+            {
+                activeAudioEngine.Volume = settingsPanel.MuteSoundfont.Value ? 0 : settingsPanel.SoundFontVolume.Value;
+            }
+
+            // Apply Backing Track Volume
+            if (backingTrack != null)
+            {
+                backingTrack.Volume.Value = settingsPanel.MuteBackingAudio.Value ? 0 : settingsPanel.BackingAudioVolume.Value;
+            }
+        }
+        [BackgroundDependencyLoader]    
         private void load()
         {
             noteCanvas = new Container
@@ -63,9 +81,21 @@ namespace arenji.Game
             loadingOverlay = new arenjiLoadingOverlay();
             backgroundLayer = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MaxValue };
             bgSelector = new arenjiBackgroundSelector();
-            
 
-            // 2. WIRE UP THE SETTINGS PANEL UI ACTIONS
+            audioSelector = new arenjiAudioSelector();
+            settingsPanel.OnRequestAudioImport = () => audioSelector.Show();
+            audioSelector.OnFileSelected = (filePath) => 
+            {
+                string savedPath = arenjiProjectManager.ImportBackingAudio(filePath);
+                ApplyBackingAudio(savedPath);
+                arenjiProjectManager.SaveCurrentProject(settingsPanel);
+            };
+
+            settingsPanel.MuteSoundfont.BindValueChanged(_ => applyMasterVolumes(), true);
+            settingsPanel.MuteBackingAudio.BindValueChanged(_ => applyMasterVolumes(), true);
+            settingsPanel.SoundFontVolume.BindValueChanged(_ => applyMasterVolumes(), true);
+            settingsPanel.BackingAudioVolume.BindValueChanged(_ => applyMasterVolumes(), true);
+
             settingsPanel.OnRequestAdvancedColors = (mode) => advancedColorOverlay.OpenForMode(mode);
             settingsPanel.OnRequestImport = () => importPrompt.Show();
             settingsPanel.OnRequestBackgroundChange = () => bgSelector.Show();
@@ -79,7 +109,6 @@ namespace arenji.Game
                 arenjiProjectManager.SaveCurrentProject(settingsPanel);
                 ApplyBackground(safeName);
             };
-            // 3. WIRE UP THE OPACITY SLIDER
             settingsPanel.NoteOpacity.ValueChanged += e => 
             {
                 ArenjiColorManager.GlobalOpacity = e.NewValue;
@@ -87,7 +116,6 @@ namespace arenji.Game
             settingsPanel.BackgroundOffset.ValueChanged += e => 
             {
                 if (backgroundClock != null) 
-                    // THE FIX: Multiply the UI seconds by 1000 to get framework milliseconds!
                     backgroundClock.Offset = e.NewValue * 1000f; 
             };
 
@@ -104,6 +132,11 @@ namespace arenji.Game
                     midiFile = Melanchall.DryWetMidi.Core.MidiFile.Read(stream);
                 }    
                 LoadNewMidi(loadedMidiPath, midiFile);
+                ApplyBackingAudio(arenjiProjectManager.CurrentBackingAudioPath);
+                if (backingTrack != null)
+                {
+                    backingTrack.Volume.Value = settingsPanel.MuteBackingAudio.Value ? 0 : settingsPanel.BackingAudioVolume.Value;
+                }
                 ApplyBackground(arenjiProjectManager.CurrentBackgroundPath);
             };
 
@@ -120,6 +153,7 @@ namespace arenji.Game
                 projectPrompt,
                 importPrompt,
                 bgSelector,
+                audioSelector,
                 loadingOverlay
             };
         }
@@ -206,7 +240,7 @@ namespace arenji.Game
                     {
                         midiFile = Melanchall.DryWetMidi.Core.MidiFile.Read(stream);
                     }
-                    ApplyBackground(arenjiProjectManager.CurrentBackgroundPath);
+                    //ApplyBackground(arenjiProjectManager.CurrentBackgroundPath);
                     LoadNewMidi(targetMidi, midiFile);
                 };
                 
@@ -214,6 +248,55 @@ namespace arenji.Game
             }
         }
 
+        public void ApplyBackingAudio(string filePath)
+        {
+            // 1. Clean up the old track before loading a new one
+            if (backingTrack != null)
+            {
+                backingTrack.Stop();
+                backingTrack.Dispose();
+                backingTrack = null;
+            }
+
+            if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) return;
+
+            try
+            {
+                if (globalAudioManager == null)
+                {
+                    osu.Framework.Logging.Logger.Log("ApplyBackingAudio failed: globalAudioManager is null.", osu.Framework.Logging.LoggingTarget.Runtime, osu.Framework.Logging.LogLevel.Error);
+                    return;
+                }
+
+                string folder = Path.GetDirectoryName(filePath);
+                string fileName = Path.GetFileName(filePath);
+
+                var storage = new osu.Framework.Platform.NativeStorage(folder);
+                var trackStore = globalAudioManager.GetTrackStore(new osu.Framework.IO.Stores.StorageBackedResourceStore(storage));
+
+                backingTrack = trackStore.Get(fileName);
+                applyMasterVolumes();
+                if (backingTrack != null)
+                {
+                    backingTrack.Volume.Value = settingsPanel.MuteBackingAudio.Value ? 0 : settingsPanel.BackingAudioVolume.Value;
+
+                    if (activeAudioEngine != null && activeAudioEngine.AudioClock != null)
+                    {
+                        backingTrack.Seek(activeAudioEngine.AudioClock.CurrentTime);
+                        
+                        if (activeAudioEngine.AudioClock.IsRunning)
+                        {
+                            backingTrack.Start();
+                        }
+                    }
+                    controlPanel.LinkBackingTrack(backingTrack);
+                }
+            }
+            catch (Exception ex)
+            {
+                osu.Framework.Logging.Logger.Log($"Audio failed to load: {ex.Message}", osu.Framework.Logging.LoggingTarget.Runtime, osu.Framework.Logging.LogLevel.Error);
+            }
+        }
         public void LoadNewMidi(string midiPath, MidiFile midiFile)
         {
             if (activeAudioEngine != null)
@@ -296,7 +379,13 @@ namespace arenji.Game
                         keyboard.LoadNotes(allVisualNotes);
                         controlPanel.LinkEngine(activeAudioEngine);
                         
-                        activeAudioEngine.Play(); 
+                        activeAudioEngine.Play();
+                        applyMasterVolumes();
+                        if (backingTrack != null)
+                        {
+                            backingTrack.Seek(0);
+                            backingTrack.Start();
+                        }
                         loadingOverlay.Hide(); 
                     });
                 }
