@@ -18,7 +18,7 @@ namespace arenji.Game
         public readonly BindableFloat NoteRoundness = new BindableFloat(0.5f) { MinValue = 0f, MaxValue = 20f };
         public readonly BindableFloat NoteOpacity = new BindableFloat(1.0f) { MinValue = 0f, MaxValue = 1.0f};
         public readonly BindableFloat BackgroundOpacity = new BindableFloat(1.0f) { MinValue = 0f, MaxValue = 1.0f};
-        public readonly BindableFloat BackgroundOffset = new BindableFloat(0f) { MinValue = -5000f, MaxValue = 5000f };
+        public readonly BindableFloat BackgroundOffset = new BindableFloat(0f) { MinValue = -10f, MaxValue = 10f };
         public Action<NoteColorMode> OnRequestAdvancedColors;
         public Action OnRequestBackgroundChange;
         public Action OnRequestImport;
@@ -72,7 +72,7 @@ namespace arenji.Game
                 new Container
                 {
                     Anchor = Anchor.Centre, Origin = Anchor.Centre,
-                    Width = 400, AutoSizeAxes = Axes.Y,
+                    Width = 500, AutoSizeAxes = Axes.Y,
                     Masking = true, CornerRadius = 15,
                     Children = new Drawable[]
                     {
@@ -102,7 +102,7 @@ namespace arenji.Game
                                         Colour = Color4.Cyan,
                                     },
                                     createLabeledSlider("Background Opacity", BackgroundOpacity),
-                                    createLabeledSlider("Background Offset (ms)", BackgroundOffset),
+                                    createLabeledSlider("Background Offset (s)", BackgroundOffset),
                                     new SpriteText 
                                     { 
                                         Text = "Color Settings", 
@@ -168,18 +168,78 @@ namespace arenji.Game
 
         // --- YOUR EXISTING HELPERS ---
 
-        private Drawable createLabeledSlider(string label, BindableFloat bindable)
+        private Drawable createLabeledSlider(string labelText, BindableFloat bindable)
         {
+            var textBox = new BasicTextBox
+            {
+                Width = 70,
+                Height = 30,
+                // Default the text to the current value
+                Text = bindable.Value.ToString("0.00")
+            };
+
+            var slider = new BasicSliderBar<float>
+            {
+                RelativeSizeAxes = Axes.X,
+                Width = 0.75f, // Take up 75% of the width, leaving room for the text box
+                Height = 30,
+                Current = bindable
+            };
+
+            // 1. When the user TYPES, update the slider
+            textBox.Current.ValueChanged += e =>
+            {
+                // TryParse prevents the game from crashing if they type letters instead of numbers!
+                if (float.TryParse(e.NewValue, out float parsed))
+                {
+                    // The BindableFloat will automatically clamp this value to your Min/Max settings
+                    bindable.Value = parsed; 
+                }
+            };
+
+            // When the user presses ENTER or clicks away, reformat the text nicely
+            textBox.OnCommit += (sender, isNew) =>
+            {
+                textBox.Text = bindable.Value.ToString("0.00");
+            };
+
+            // 2. When the SLIDER moves, update the text box
+            bindable.BindValueChanged(e =>
+            {
+                // We only update the text if the user isn't actively typing in it.
+                // Otherwise, the text box fights their cursor!
+                if (!textBox.HasFocus)
+                {
+                    textBox.Text = e.NewValue.ToString("0.00");
+                }
+            }, true); // "true" forces it to run once immediately upon creation
+
+            // 3. Build the UI Row
             return new FillFlowContainer
             {
-                RelativeSizeAxes = Axes.X, AutoSizeAxes = Axes.Y, Direction = FillDirection.Vertical, Spacing = new Vector2(0, 5),
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Spacing = new osuTK.Vector2(0, 5),
                 Children = new Drawable[]
                 {
-                    new SpriteText { Text = label, Font = FrameworkFont.Regular.With(size: 16) },
-                    new BasicSliderBar<float>
+                    new SpriteText 
+                    { 
+                        Text = labelText, 
+                        Font = FrameworkFont.Regular.With(size: 20),
+                        Colour = Color4.White
+                    },
+                    new FillFlowContainer
                     {
-                        RelativeSizeAxes = Axes.X, Height = 20, Current = bindable,
-                        BackgroundColour = Color4.Black, SelectionColour = Color4.Cyan
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Horizontal,
+                        Spacing = new osuTK.Vector2(10, 0),
+                        Children = new Drawable[]
+                        {
+                            slider,
+                            textBox
+                        }
                     }
                 }
             };

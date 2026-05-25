@@ -84,6 +84,12 @@ namespace arenji.Game
             {
                 ArenjiColorManager.GlobalOpacity = e.NewValue;
             };
+            settingsPanel.BackgroundOffset.ValueChanged += e => 
+            {
+                if (backgroundClock != null) 
+                    // THE FIX: Multiply the UI seconds by 1000 to get framework milliseconds!
+                    backgroundClock.Offset = e.NewValue * 1000f; 
+            };
 
             importPrompt.OnConfirm = (folderPath) =>
             {
@@ -284,7 +290,7 @@ namespace arenji.Game
                         keyboard.Clock = new osu.Framework.Timing.FramedClock(activeAudioEngine.AudioClock);
                         backgroundClock = new osu.Framework.Timing.OffsetClock(activeAudioEngine.AudioClock) 
                         { 
-                            Offset = settingsPanel.BackgroundOffset.Value 
+                            Offset = settingsPanel.BackgroundOffset.Value * 1000f
                         };
                         backgroundLayer.Clock = new osu.Framework.Timing.FramedClock(backgroundClock);
                         keyboard.LoadNotes(allVisualNotes);

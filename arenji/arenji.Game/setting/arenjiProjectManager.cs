@@ -34,10 +34,10 @@ namespace arenji.Game
                 $"NoteOpacity={settingsPanel.NoteOpacity.Value}",
                 $"ColorMode={ArenjiColorManager.CurrentMode}",
                 $"SolidColor={ArenjiColorManager.ToHex(ArenjiColorManager.SolidColor)}",
+                $"BlackNoteWidth={settingsPanel.BlackNoteWidth.Value}",
                 "",
                 "[Background Setting]",
                 $"BackgroundFile={CurrentBackgroundPath}",
-                $"BlackNoteWidth={settingsPanel.BlackNoteWidth.Value}",
                 $"BackgroundOpacity={settingsPanel.BackgroundOpacity.Value}",
                 $"BackgroundOffset={settingsPanel.BackgroundOffset.Value}",
                 "",
@@ -133,7 +133,7 @@ namespace arenji.Game
 
                 else if (currentSection == "[Background Setting]")
                 {
-                    if (key == "BackgroundPath") CurrentBackgroundPath = value; 
+                    if (key == "BackgroundFile") CurrentBackgroundPath = value; 
                     else if (key == "BackgroundOffset") settingsPanel.BackgroundOffset.Value = float.Parse(value);              
                     else if (key == "BackgroundOpacity")
                     {
