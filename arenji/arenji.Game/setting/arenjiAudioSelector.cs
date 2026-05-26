@@ -22,16 +22,31 @@ namespace arenji.Game
         {
             RelativeSizeAxes = Axes.Both;
 
+            // THE FIX: Build the button first so it exists in memory before the file selector fires!
+            confirmButton = new BasicButton
+            {
+                RelativeSizeAxes = Axes.None, Width = 280, Height = 40, Text = "Import Audio",
+                BackgroundColour = Color4.Gray,
+                Action = () =>
+                {
+                    if (!string.IsNullOrEmpty(selectedFilePath))
+                    {
+                        OnFileSelected?.Invoke(selectedFilePath);
+                        Hide();
+                    }
+                }
+            };
+            // Start it disabled by default
+            confirmButton.Enabled.Value = false; 
+
             Children = new Drawable[]
             {
-                // Click outside the panel to close it
                 new ClickableContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Action = Hide,
                     Child = new Box { RelativeSizeAxes = Axes.Both, Colour = Color4.Black, Alpha = 0.8f }
                 },
-                // The main panel (shielded from closing clicks)
                 new ClickableContainer
                 {
                     Anchor = Anchor.Centre, Origin = Anchor.Centre,
@@ -77,14 +92,12 @@ namespace arenji.Game
                                             }
                                         }
                                         
-                                        // Reset if invalid selection or if they click off a file
                                         selectedFilePath = string.Empty;
                                         confirmButton.Enabled.Value = false;
                                         confirmButton.BackgroundColour = Color4.Gray;
-                                    }, true); // "true" forces the button to gray-out immediately on load!
+                                    }, true); // Now this is safe, because the button exists!
                                 }),
 
-                                // The side-by-side action buttons
                                 new FillFlowContainer
                                 {
                                     RelativeSizeAxes = Axes.X, Height = 40,
@@ -97,19 +110,7 @@ namespace arenji.Game
                                             RelativeSizeAxes = Axes.None, Width = 270, Height = 40, Text = "Cancel",
                                             BackgroundColour = Color4.DarkRed, Action = Hide
                                         },
-                                        confirmButton = new BasicButton
-                                        {
-                                            RelativeSizeAxes = Axes.None, Width = 280, Height = 40, Text = "Import Audio",
-                                            BackgroundColour = Color4.Gray,
-                                            Action = () =>
-                                            {
-                                                if (!string.IsNullOrEmpty(selectedFilePath))
-                                                {
-                                                    OnFileSelected?.Invoke(selectedFilePath);
-                                                    Hide();
-                                                }
-                                            }
-                                        }
+                                        confirmButton
                                     }
                                 }
                             }
