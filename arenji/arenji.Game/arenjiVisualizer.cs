@@ -133,6 +133,7 @@ namespace arenji.Game
                 }    
                 LoadNewMidi(loadedMidiPath, midiFile);
                 ApplyBackingAudio(arenjiProjectManager.CurrentBackingAudioPath);
+
                 if (backingTrack != null)
                 {
                     backingTrack.Volume.Value = settingsPanel.MuteBackingAudio.Value ? 0 : settingsPanel.BackingAudioVolume.Value;
@@ -303,6 +304,7 @@ namespace arenji.Game
             {
                 activeAudioEngine.Pause();
                 activeAudioEngine.Dispose();
+                activeAudioEngine = null;
             }
 
             int myLoadId = ++currentLoadId;

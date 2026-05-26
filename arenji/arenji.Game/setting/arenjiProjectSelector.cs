@@ -11,10 +11,10 @@ using System.IO;
 
 namespace arenji.Game
 {
-    public partial class arenjiAudioSelector : FocusedOverlayContainer
+    public partial class arenjiProjectSelector : FocusedOverlayContainer
     {
-        public Action<string> OnFileSelected;
-        private string selectedFilePath = string.Empty;
+        public Action<string> OnFolderConfirmed;
+        private string selectedFolderPath = string.Empty;
         private BasicButton confirmButton;
 
         [BackgroundDependencyLoader]
@@ -24,20 +24,19 @@ namespace arenji.Game
 
             Children = new Drawable[]
             {
-                // Click outside the panel to close it
+                // Click outside to close
                 new ClickableContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Action = Hide,
                     Child = new Box { RelativeSizeAxes = Axes.Both, Colour = Color4.Black, Alpha = 0.8f }
                 },
-                // The main panel (shielded from closing clicks)
                 new ClickableContainer
                 {
                     Anchor = Anchor.Centre, Origin = Anchor.Centre,
-                    Width = 600, Height = 520,
+                    Width = 600, Height = 550,
                     Masking = true, CornerRadius = 15,
-                    Action = () => { }, 
+                    Action = () => { }, // Shield click
                     Children = new Drawable[]
                     {
                         new Box { RelativeSizeAxes = Axes.Both, Colour = new Color4(30, 30, 30, 255) },
@@ -48,43 +47,39 @@ namespace arenji.Game
                             {
                                 new SpriteText 
                                 { 
-                                    Text = "Select Backing Audio", 
+                                    Text = "Select Project Folder", 
                                     Font = FontUsage.Default.With(size: 24), 
                                     Colour = Color4.Cyan, 
                                     Margin = new MarginPadding { Bottom = 10 } 
                                 },
                                 
-                                new BasicFileSelector
+                                // THE SELECTOR
+                                new BasicDirectorySelector
                                 {
                                     RelativeSizeAxes = Axes.X, Height = 380
                                 }.With(s => 
                                 {
-                                    s.CurrentPath.Value = new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic));
+                                    s.CurrentPath.Value = new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
                                     
-                                    s.CurrentFile.BindValueChanged(e => 
+                                    // When they click a directory, track it but DON'T execute yet
+                                    s.CurrentPath.BindValueChanged(e => 
                                     {
-                                        if (e.NewValue != null)
+                                        if (e.NewValue != null && Directory.Exists(e.NewValue.FullName))
                                         {
-                                            string ext = e.NewValue.Extension.ToLower();
-                                            string[] allowed = { ".mp3", ".wav", ".ogg" };
-                                            
-                                            if (Array.Exists(allowed, x => x == ext))
-                                            {
-                                                selectedFilePath = e.NewValue.FullName;
-                                                confirmButton.Enabled.Value = true;
-                                                confirmButton.BackgroundColour = Color4.MediumSeaGreen;
-                                                return;
-                                            }
+                                            selectedFolderPath = e.NewValue.FullName;
+                                            confirmButton.Enabled.Value = true;
+                                            confirmButton.BackgroundColour = Color4.ForestGreen;
                                         }
-                                        
-                                        // Reset if invalid selection or if they click off a file
-                                        selectedFilePath = string.Empty;
-                                        confirmButton.Enabled.Value = false;
-                                        confirmButton.BackgroundColour = Color4.Gray;
-                                    }, true); // "true" forces the button to gray-out immediately on load!
+                                        else
+                                        {
+                                            selectedFolderPath = string.Empty;
+                                            confirmButton.Enabled.Value = false;
+                                            confirmButton.BackgroundColour = Color4.Gray;
+                                        }
+                                    }, true);
                                 }),
 
-                                // The side-by-side action buttons
+                                // HORIZONTAL ACTION BUTTONS
                                 new FillFlowContainer
                                 {
                                     RelativeSizeAxes = Axes.X, Height = 40,
@@ -99,13 +94,13 @@ namespace arenji.Game
                                         },
                                         confirmButton = new BasicButton
                                         {
-                                            RelativeSizeAxes = Axes.None, Width = 280, Height = 40, Text = "Import Audio",
+                                            RelativeSizeAxes = Axes.None, Width = 280, Height = 40, Text = "Confirm Import",
                                             BackgroundColour = Color4.Gray,
                                             Action = () =>
                                             {
-                                                if (!string.IsNullOrEmpty(selectedFilePath))
+                                                if (!string.IsNullOrEmpty(selectedFolderPath))
                                                 {
-                                                    OnFileSelected?.Invoke(selectedFilePath);
+                                                    OnFolderConfirmed?.Invoke(selectedFolderPath);
                                                     Hide();
                                                 }
                                             }
