@@ -357,7 +357,22 @@ namespace arenji.Game
             {
                 try
                 {
-                    string mySoundFontPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "sf", "Touhou.sf2"); 
+                    string sfDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "sf");
+                    string mySoundFontPath = string.Empty;
+
+                    if (Directory.Exists(sfDirectory))
+                    {
+                        string[] sfFiles = Directory.GetFiles(sfDirectory, "*.sf2");
+                        if (sfFiles.Length > 0)
+                        {
+                            mySoundFontPath = sfFiles[0];
+                        }
+                    }
+
+                    if (string.IsNullOrEmpty(mySoundFontPath))
+                    {
+                        osu.Framework.Logging.Logger.Log("CRITICAL: No .sf2 soundfont found in the ./sf/ directory! Please add one.", osu.Framework.Logging.LoggingTarget.Runtime, osu.Framework.Logging.LogLevel.Error);
+                    }
                     activeAudioEngine.LoadFiles(midiPath, mySoundFontPath);
                     
                     Schedule(() =>
