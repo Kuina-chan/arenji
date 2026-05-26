@@ -22,9 +22,24 @@ namespace arenji.Game
         {
             RelativeSizeAxes = Axes.Both;
 
+            confirmButton = new BasicButton
+            {
+                RelativeSizeAxes = Axes.None, Width = 280, Height = 40, Text = "Confirm Import",
+                BackgroundColour = Color4.Gray,
+                Action = () =>
+                {
+                    if (!string.IsNullOrEmpty(selectedFolderPath))
+                    {
+                        OnFolderConfirmed?.Invoke(selectedFolderPath);
+                        Hide();
+                    }
+                }
+            };
+
+            confirmButton.Enabled.Value = false;
+
             Children = new Drawable[]
             {
-                // Click outside to close
                 new ClickableContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -53,7 +68,6 @@ namespace arenji.Game
                                     Margin = new MarginPadding { Bottom = 10 } 
                                 },
                                 
-                                // THE SELECTOR
                                 new BasicDirectorySelector
                                 {
                                     RelativeSizeAxes = Axes.X, Height = 380
@@ -61,7 +75,6 @@ namespace arenji.Game
                                 {
                                     s.CurrentPath.Value = new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
                                     
-                                    // When they click a directory, track it but DON'T execute yet
                                     s.CurrentPath.BindValueChanged(e => 
                                     {
                                         if (e.NewValue != null && Directory.Exists(e.NewValue.FullName))
@@ -79,7 +92,6 @@ namespace arenji.Game
                                     }, true);
                                 }),
 
-                                // HORIZONTAL ACTION BUTTONS
                                 new FillFlowContainer
                                 {
                                     RelativeSizeAxes = Axes.X, Height = 40,
@@ -92,19 +104,9 @@ namespace arenji.Game
                                             RelativeSizeAxes = Axes.None, Width = 270, Height = 40, Text = "Cancel",
                                             BackgroundColour = Color4.DarkRed, Action = Hide
                                         },
-                                        confirmButton = new BasicButton
-                                        {
-                                            RelativeSizeAxes = Axes.None, Width = 280, Height = 40, Text = "Confirm Import",
-                                            BackgroundColour = Color4.Gray,
-                                            Action = () =>
-                                            {
-                                                if (!string.IsNullOrEmpty(selectedFolderPath))
-                                                {
-                                                    OnFolderConfirmed?.Invoke(selectedFolderPath);
-                                                    Hide();
-                                                }
-                                            }
-                                        }
+                                        
+                                        // Just inject the pre-built button here!
+                                        confirmButton
                                     }
                                 }
                             }

@@ -37,6 +37,7 @@ namespace arenji.Game
         private osu.Framework.Timing.OffsetClock backgroundClock;
         private arenjiAudioSelector audioSelector;
         private osu.Framework.Audio.Track.Track backingTrack;
+        private arenjiProjectSelector projectSelector;
         [osu.Framework.Allocation.Resolved]
         private AudioManager osuAudioManager { get; set; }
         [osu.Framework.Allocation.Resolved]
@@ -81,7 +82,7 @@ namespace arenji.Game
             loadingOverlay = new arenjiLoadingOverlay();
             backgroundLayer = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MaxValue };
             bgSelector = new arenjiBackgroundSelector();
-
+            projectSelector = new arenjiProjectSelector();
             audioSelector = new arenjiAudioSelector();
             settingsPanel.OnRequestAudioImport = () => audioSelector.Show();
             audioSelector.OnFileSelected = (filePath) => 
@@ -95,7 +96,7 @@ namespace arenji.Game
             settingsPanel.MuteBackingAudio.BindValueChanged(_ => applyMasterVolumes(), true);
             settingsPanel.SoundFontVolume.BindValueChanged(_ => applyMasterVolumes(), true);
             settingsPanel.BackingAudioVolume.BindValueChanged(_ => applyMasterVolumes(), true);
-
+            settingsPanel.OnRequestImport = () => projectSelector.Show();
             settingsPanel.OnRequestAdvancedColors = (mode) => advancedColorOverlay.OpenForMode(mode);
             settingsPanel.OnRequestImport = () => importPrompt.Show();
             settingsPanel.OnRequestBackgroundChange = () => bgSelector.Show();
@@ -140,6 +141,44 @@ namespace arenji.Game
                 }
                 ApplyBackground(arenjiProjectManager.CurrentBackgroundPath);
             };
+            projectSelector.OnFolderConfirmed = (folderPath) =>
+            {
+                try
+                {
+                    string iniPath = Path.Combine(folderPath, "project.ini");
+                    
+                    if (!File.Exists(iniPath))
+                    {
+                        osu.Framework.Logging.Logger.Log($"IMPORT FAILED: No project.ini found in {folderPath}", osu.Framework.Logging.LoggingTarget.Runtime, osu.Framework.Logging.LogLevel.Error);
+                        return;
+                    }
+
+                    arenjiProjectManager.CurrentProjectFolder = folderPath; 
+
+                    string loadedMidiPath = arenjiProjectManager.LoadProject(iniPath, settingsPanel);
+                    settingsPanel.RefreshUIAfterLoad(); 
+
+                    if (!File.Exists(loadedMidiPath))
+                    {
+                        osu.Framework.Logging.Logger.Log($"IMPORT FAILED: Midi file missing at {loadedMidiPath}", osu.Framework.Logging.LoggingTarget.Runtime, osu.Framework.Logging.LogLevel.Error);
+                        return;
+                    }
+
+                    Melanchall.DryWetMidi.Core.MidiFile midiFile;
+                    using (var stream = new FileStream(loadedMidiPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    {
+                        midiFile = Melanchall.DryWetMidi.Core.MidiFile.Read(stream);
+                    }
+                    
+                    LoadNewMidi(loadedMidiPath, midiFile);
+                    ApplyBackground(arenjiProjectManager.CurrentBackgroundPath); 
+                    ApplyBackingAudio(arenjiProjectManager.CurrentBackingAudioPath);
+                }
+                catch (Exception ex)
+                {
+                    osu.Framework.Logging.Logger.Log($"CRITICAL IMPORT ERROR: {ex.Message}", osu.Framework.Logging.LoggingTarget.Runtime, osu.Framework.Logging.LogLevel.Error);
+                }
+            };
 
             // 5. ADD EVERYTHING TO THE SCREEN (Layered back to front)
             InternalChildren = new Drawable[] 
@@ -155,6 +194,7 @@ namespace arenji.Game
                 importPrompt,
                 bgSelector,
                 audioSelector,
+                projectSelector,
                 loadingOverlay
             };
         }
