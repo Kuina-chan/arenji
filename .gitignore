@@ -349,3 +349,5 @@ osu.Framework.NativeLibs/scripts/ffmpeg/*.tar.gz
 
 #sf soundfont
 *.sf2
+
+*.lscache

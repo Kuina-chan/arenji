@@ -1,33 +1,21 @@
 {
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Cake: Debug Script (CoreCLR)",
-            "type": "coreclr",
-            "request": "launch",
-            "program": "${workspaceRoot}/tools/Cake.CoreCLR/Cake.dll",
-            "args": [
-                "${workspaceRoot}/build/build.cake",
-                "--debug",
-                "--verbosity=diagnostic"
-            ],
-            "cwd": "${workspaceRoot}/build",
-            "stopAtEntry": true,
-            "externalConsole": false
-        },
-        {
+    "configurations": [{
             "name": "VisualTests (Debug)",
             "type": "coreclr",
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/osu.Framework.Tests/bin/Debug/net8.0/osu.Framework.Tests.dll",
+                "${workspaceRoot}/arenji.Game.Tests/bin/Debug/net8.0/arenji.Game.Tests.dll",
             ],
             "cwd": "${workspaceRoot}",
-            "preLaunchTask": "Build (Debug)",
+            "preLaunchTask": "Build (Tests, Debug)",
             "linux": {
                 "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Framework.Tests/bin/Debug/net8.0:${env:LD_LIBRARY_PATH}"
+                    "LD_LIBRARY_PATH": "${workspaceRoot}/arenji.Game.Tests/bin/Debug/net8.0:${env:LD_LIBRARY_PATH}"
                 }
             },
             "console": "internalConsole"
@@ -38,68 +26,50 @@
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/osu.Framework.Tests/bin/Release/net8.0/osu.Framework.Tests.dll",
+                "${workspaceRoot}/arenji.Game.Tests/bin/Release/net8.0/arenji.Game.Tests.dll",
             ],
             "cwd": "${workspaceRoot}",
-            "preLaunchTask": "Build (Release)",
+            "preLaunchTask": "Build (Tests, Release)",
             "linux": {
                 "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Framework.Tests/bin/Release/net8.0:${env:LD_LIBRARY_PATH}"
+                    "LD_LIBRARY_PATH": "${workspaceRoot}/arenji.Game.Tests/bin/Release/net8.0:${env:LD_LIBRARY_PATH}"
                 }
             },
             "console": "internalConsole"
         },
         {
-            "name": "SampleGame (Debug)",
+            "name": "arenji (Debug)",
             "type": "coreclr",
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/SampleGame.Desktop/bin/Debug/net8.0/SampleGame.Desktop.dll",
+                "${workspaceRoot}/arenji.Desktop/bin/Debug/net8.0/arenji.dll",
             ],
             "cwd": "${workspaceRoot}",
-            "preLaunchTask": "Build SampleGame (Debug)",
+            "preLaunchTask": "Build (Desktop, Debug)",
             "linux": {
                 "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/SampleGame.Desktop/bin/Debug/net8.0:${env:LD_LIBRARY_PATH}"
+                    "LD_LIBRARY_PATH": "${workspaceRoot}/arenji.Desktop/bin/Debug/net8.0:${env:LD_LIBRARY_PATH}"
                 }
             },
             "console": "internalConsole"
         },
         {
-            "name": "SampleGame (Release)",
+            "name": "arenji (Release)",
             "type": "coreclr",
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/SampleGame.Desktop/bin/Release/net8.0/SampleGame.Desktop.dll",
+                "${workspaceRoot}/arenji.Desktop/bin/Debug/net8.0/arenji.dll",
             ],
             "cwd": "${workspaceRoot}",
-            "preLaunchTask": "Build SampleGame (Release)",
+            "preLaunchTask": "Build (Desktop, Release)",
             "linux": {
                 "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/SampleGame.Desktop/bin/Release/net8.0:${env:LD_LIBRARY_PATH}"
+                    "LD_LIBRARY_PATH": "${workspaceRoot}/arenji.Desktop/bin/Debug/net8.0:${env:LD_LIBRARY_PATH}"
                 }
             },
             "console": "internalConsole"
-        },
-        {
-            "name": "Benchmarks",
-            "type": "coreclr",
-            "request": "launch",
-            "program": "dotnet",
-            "args": [
-                "${workspaceRoot}/osu.Framework.Benchmarks/bin/Release/net8.0/osu.Framework.Benchmarks.dll",
-                "--filter",
-                "*",
-            ],
-            "cwd": "${workspaceRoot}",
-            "preLaunchTask": "Build Benchmarks",
-            "linux": {
-                "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Framework.Benchmarks/bin/Release/net8.0:${env:LD_LIBRARY_PATH}"
-                }
-            },
         }
     ]
 }
