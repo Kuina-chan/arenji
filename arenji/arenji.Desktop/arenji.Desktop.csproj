@@ -5,8 +5,8 @@
     <AssemblyName>arenji</AssemblyName>
     <ApplicationIcon>game.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>0.0.0</Version>
-    <FileVersion>0.0.0</FileVersion>
+    <Version>2026.527.0</Version>
+    <FileVersion>2026.527.0</FileVersion>
   </PropertyGroup>
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\arenji.Game\arenji.Game.csproj" />
