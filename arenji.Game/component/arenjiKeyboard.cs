@@ -1,6 +1,9 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osuTK; // REQUIRED for Vector2
+using osuTK.Graphics; // REQUIRED for Color4
+using System; // REQUIRED for Action
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,6 +14,9 @@ namespace arenji.Game
         private const int MIN_MIDI_PITCH = 21; 
         private const int MAX_MIDI_PITCH = 108; 
         private const int TOTAL_WHITE_KEYS = 52;
+        
+        // 1. THE DEFINITION: This is what your Visualizer is trying to talk to!
+        public Action<Vector2, Color4, int> OnKeyHit;
 
         private Dictionary<int, PianoKey> keysByPitch = new Dictionary<int, PianoKey>();
 
@@ -27,6 +33,8 @@ namespace arenji.Game
                 {
                     Depth = isBlack ? -1 : 0 
                 };
+
+                key.OnKeyHit = (pos, color, velocity) => OnKeyHit?.Invoke(pos, color, velocity);
 
                 if (!isBlack)
                 {

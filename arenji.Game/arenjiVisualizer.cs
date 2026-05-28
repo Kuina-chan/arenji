@@ -15,7 +15,7 @@ using System;
 using System.IO;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
-using OpenTabletDriver.Plugin.DependencyInjection;
+using arenji.Game.particles;
 
 namespace arenji.Game
 {
@@ -38,6 +38,7 @@ namespace arenji.Game
         private arenjiAudioSelector audioSelector;
         private osu.Framework.Audio.Track.Track backingTrack;
         private arenjiProjectSelector projectSelector;
+        private ParticleEmitter particleLayer;
         [osu.Framework.Allocation.Resolved]
         private AudioManager osuAudioManager { get; set; }
         [osu.Framework.Allocation.Resolved]
@@ -72,7 +73,17 @@ namespace arenji.Game
                 Anchor = Anchor.BottomLeft, Origin = Anchor.BottomLeft,
                 RelativeSizeAxes = Axes.X, Height = 120
             };
+            particleLayer = new ParticleEmitter();
+            keyboard.OnKeyHit = (position, color, velocity) => 
+            {
+                int count = (int)(velocity / 10f);
+                if (count < 5) count = 5;
+                double userLifetime = settingsPanel.ParticleLifeTime.Value * 1000;
+                float userSpeed = settingsPanel.ParticleSpeed.Value;
+                float userTurbulence = settingsPanel.ParticleTurbulance.Value;
 
+                particleLayer.Emit(position, color, count, userLifetime, userSpeed, userTurbulence);
+            };
             controlPanel = new arenjiPlaybackControl { Anchor = Anchor.TopLeft, Origin = Anchor.TopLeft };
             
             settingsPanel = new arenjiSettings { State = { Value = Visibility.Hidden } };
@@ -187,6 +198,7 @@ namespace arenji.Game
                 backgroundLayer,
                 noteCanvas,
                 keyboard,
+                particleLayer,
                 controlPanel,
                 settingsPanel,
                 advancedColorOverlay,
@@ -289,7 +301,7 @@ namespace arenji.Game
             }
         }
 
-        public void ApplyBackingAudio(string filePath)
+        public void ApplyBackingAudio(string filePath)  
         {
             // 1. Clean up the old track before loading a new one
             if (backingTrack != null)

@@ -16,6 +16,7 @@ namespace arenji.Game
         public int TrackIndex; 
         public int PitchClass;
         public int ChannelIndex;
+        public bool HasHit { get; set; }
     }
 
     public partial class DrawableMidiNote : CompositeDrawable

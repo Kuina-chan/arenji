@@ -22,6 +22,9 @@ namespace arenji.Game
         public readonly BindableFloat BackgroundOffset = new BindableFloat(0f) { MinValue = -10f, MaxValue = 10f };
         public readonly BindableFloat SoundFontVolume = new BindableFloat(0f) { MinValue = 0f, MaxValue = 1.0f };
         public readonly BindableFloat BackingAudioVolume = new BindableFloat(0f) { MinValue = 0f, MaxValue = 1.0f };
+        public readonly BindableFloat ParticleLifeTime = new BindableFloat(0.1f) { MinValue = 0f, MaxValue = 5f};
+        public readonly BindableFloat ParticleTurbulance = new BindableFloat(20f) { MinValue = 0f, MaxValue = 100f};
+        public readonly BindableFloat ParticleSpeed = new BindableFloat(1.2f) { MinValue = 0f, MaxValue = 5f};
         public readonly BindableBool MuteSoundfont = new BindableBool(false);
         public readonly BindableBool MuteBackingAudio = new BindableBool(false);
         public Action OnRequestAudioImport;
@@ -117,7 +120,7 @@ namespace arenji.Game
                     Anchor = Anchor.Centre, Origin = Anchor.Centre,
                     Width = 500, AutoSizeAxes = Axes.Y,
                     Masking = true, CornerRadius = 15,
-                    Action = () => { }, // Empty action eats the click safely!
+                    Action = () => { },
                     Children = new Drawable[]
                     {
                         new Box { RelativeSizeAxes = Axes.Both, Colour = new Color4(40, 40, 40, 255) },
@@ -167,7 +170,14 @@ namespace arenji.Game
                                     },
                                     createModeCycleButton(),
                                     solidSettingsGroup,
-                                    advancedColorsButton
+                                    advancedColorsButton,
+                                    new SpriteText
+                                    {
+                                        Text = "Particle Setting", Font = FrameworkFont.Regular.With(size: 24), Colour = Color4.Cyan, Margin = new MarginPadding { Top = 20, Bottom = 5 }
+                                    },
+                                    createLabeledSlider("Particle Lifetime", ParticleLifeTime),
+                                    createLabeledSlider("Particle Speed", ParticleSpeed),
+                                    createLabeledSlider("Particle Turbulance", ParticleTurbulance)
                                 }
                             }
                         }
