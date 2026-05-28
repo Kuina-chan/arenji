@@ -49,6 +49,13 @@ namespace arenji.Game
                 $"BackgroundOpacity={settingsPanel.BackgroundOpacity.Value}",
                 $"BackgroundOffset={settingsPanel.BackgroundOffset.Value}",
                 "",
+                "[Particle Setting]",
+                $"ParticleLifetime={settingsPanel.ParticleLifeTime.Value}",
+                $"ParticleSpeed={settingsPanel.ParticleSpeed.Value}",
+                $"ParticleTurbulance={settingsPanel.ParticleTurbulance.Value}",
+                $"ParticleSize={settingsPanel.ParticleSize.Value}",
+                $"ParticleCount={settingsPanel.ParticleCount.Value}",
+                "",
                 "[TrackColors]"
             };
 
@@ -176,6 +183,15 @@ namespace arenji.Game
                     else if (key == "BackingAudioVolume") settingsPanel.BackingAudioVolume.Value = float.Parse(value);
                     else if (key == "MuteSoundfont") settingsPanel.MuteSoundfont.Value = bool.Parse(value);
                     else if (key == "MuteBackingAudio") settingsPanel.MuteBackingAudio.Value = bool.Parse(value);
+                }
+
+                else if (currentSection == "[Particle Setting]")
+                {
+                    if (key == "ParticleLifetime") settingsPanel.ParticleLifeTime.Value = float.Parse(value);
+                    else if (key == "ParticleSpeed") settingsPanel.ParticleSpeed.Value = float.Parse(value);
+                    else if (key == "ParticleTurbulance") settingsPanel.ParticleTurbulance.Value = float.Parse(value);
+                    else if (key == "ParticleSize") settingsPanel.ParticleSize.Value = float.Parse(value);
+                    else if (key == "ParticleCount") settingsPanel.ParticleCount.Value = int.Parse(value);
                 }
                 
                 else if (currentSection == "[TrackColors]" && int.TryParse(key, out int tId))

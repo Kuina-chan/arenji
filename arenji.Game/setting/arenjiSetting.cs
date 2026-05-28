@@ -22,9 +22,11 @@ namespace arenji.Game
         public readonly BindableFloat BackgroundOffset = new BindableFloat(0f) { MinValue = -10f, MaxValue = 10f };
         public readonly BindableFloat SoundFontVolume = new BindableFloat(0f) { MinValue = 0f, MaxValue = 1.0f };
         public readonly BindableFloat BackingAudioVolume = new BindableFloat(0f) { MinValue = 0f, MaxValue = 1.0f };
-        public readonly BindableFloat ParticleLifeTime = new BindableFloat(0.1f) { MinValue = 0f, MaxValue = 5f};
-        public readonly BindableFloat ParticleTurbulance = new BindableFloat(20f) { MinValue = 0f, MaxValue = 100f};
-        public readonly BindableFloat ParticleSpeed = new BindableFloat(1.2f) { MinValue = 0f, MaxValue = 5f};
+        public readonly BindableFloat ParticleLifeTime = new BindableFloat(0.1f) { MinValue = 0f, MaxValue = 3f};
+        public readonly BindableFloat ParticleTurbulance = new BindableFloat(20f) { MinValue = 0f, MaxValue = 200f};
+        public readonly BindableFloat ParticleSpeed = new BindableFloat(1.2f) { MinValue = 0f, MaxValue = 1f};
+        public readonly BindableFloat ParticleSize = new BindableFloat(26f) {MinValue = 0f, MaxValue = 40f};
+        public readonly BindableFloat ParticleCount = new BindableFloat(10) {MinValue = 0, MaxValue = 100, Precision = 1f};
         public readonly BindableBool MuteSoundfont = new BindableBool(false);
         public readonly BindableBool MuteBackingAudio = new BindableBool(false);
         public Action OnRequestAudioImport;
@@ -177,7 +179,9 @@ namespace arenji.Game
                                     },
                                     createLabeledSlider("Particle Lifetime", ParticleLifeTime),
                                     createLabeledSlider("Particle Speed", ParticleSpeed),
-                                    createLabeledSlider("Particle Turbulance", ParticleTurbulance)
+                                    createLabeledSlider("Particle Turbulance", ParticleTurbulance),
+                                    createLabeledSlider("Particle Size", ParticleSize),
+                                    createLabeledSlider("Particle Count", ParticleCount)
                                 }
                             }
                         }

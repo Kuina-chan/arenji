@@ -81,8 +81,10 @@ namespace arenji.Game
                 double userLifetime = settingsPanel.ParticleLifeTime.Value * 1000;
                 float userSpeed = settingsPanel.ParticleSpeed.Value;
                 float userTurbulence = settingsPanel.ParticleTurbulance.Value;
+                float userSize = settingsPanel.ParticleSize.Value;
+                int userCount = (int)settingsPanel.ParticleCount.Value;
 
-                particleLayer.Emit(position, color, count, userLifetime, userSpeed, userTurbulence);
+                particleLayer.Emit(position, color, userCount, userLifetime, userSpeed, userTurbulence, userSize);
             };
             controlPanel = new arenjiPlaybackControl { Anchor = Anchor.TopLeft, Origin = Anchor.TopLeft };
             
@@ -197,8 +199,8 @@ namespace arenji.Game
                 //new Box { RelativeSizeAxes = Axes.Both, Colour = Color4.Black },
                 backgroundLayer,
                 noteCanvas,
-                keyboard,
                 particleLayer,
+                keyboard,
                 controlPanel,
                 settingsPanel,
                 advancedColorOverlay,

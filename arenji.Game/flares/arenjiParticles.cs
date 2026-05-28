@@ -30,8 +30,9 @@ namespace arenji.Game.particles
             };
         }
 
-        public void Fire(Vector2 startPosition, Vector2 initialVelocity, Color4 color, double lifetimeMs, float turbulence)
+        public void Fire(Vector2 startPosition, Vector2 initialVelocity, Color4 color, double lifetimeMs, float turbulence, float size)
         {
+            Size = new Vector2(size);
             Position = startPosition;
             currentVelocity = initialVelocity;
             turbulenceAmount = turbulence;
