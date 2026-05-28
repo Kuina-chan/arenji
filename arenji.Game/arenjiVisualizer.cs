@@ -74,7 +74,7 @@ namespace arenji.Game
                 RelativeSizeAxes = Axes.X, Height = 120
             };
             particleLayer = new ParticleEmitter();
-            keyboard.OnKeyHit = (position, color, velocity) => 
+            keyboard.OnKeyHit = (position, keyWidth, color, velocity) => 
             {
                 int count = (int)(velocity / 10f);
                 if (count < 5) count = 5;
@@ -84,7 +84,7 @@ namespace arenji.Game
                 float userSize = settingsPanel.ParticleSize.Value;
                 int userCount = (int)settingsPanel.ParticleCount.Value;
 
-                particleLayer.Emit(position, color, userCount, userLifetime, userSpeed, userTurbulence, userSize);
+                particleLayer.Emit(position, color, keyWidth, userCount, userLifetime, userSpeed, userTurbulence, userSize);
             };
             controlPanel = new arenjiPlaybackControl { Anchor = Anchor.TopLeft, Origin = Anchor.TopLeft };
             
@@ -501,5 +501,13 @@ namespace arenji.Game
         }
 
         public void OnReleased(KeyBindingReleaseEvent<ArenjiAction> e) { }
+        protected override void Update()
+        {
+            base.Update();
+            if (activeAudioEngine != null && activeAudioEngine.AudioClock != null)
+            {
+                particleLayer.Alpha = activeAudioEngine.AudioClock.IsRunning ? 1f : 0f;
+            }
+        }
     }
 }

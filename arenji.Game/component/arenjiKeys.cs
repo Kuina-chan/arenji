@@ -14,7 +14,7 @@ namespace arenji.Game
         public readonly int MidiPitch;
         public readonly bool IsBlack;
 
-        public Action<Vector2, Color4, int> OnKeyHit;
+        public Action<Vector2, float, Color4, int> OnKeyHit;
 
         private Box visualBox;
         
@@ -72,17 +72,13 @@ namespace arenji.Game
                     isCurrentlyLit = true;
                     currentColor = ArenjiColorManager.GetColorForNote(note); 
                     
-                    // 2. THE TRIGGER: Fire particles the exact frame the note starts!
                     if (!note.HasHit)
                     {
-                        note.HasHit = true; // Mark it so it doesn't fire again tomorrow
-                        
-                        // Use a default velocity of 100 for now. 
+                        note.HasHit = true;
                         int velocity = 100; 
-                        
-                        // Pass the top-center of this exact piano key to the particle emitter!
+                        float keyWidth = this.ScreenSpaceDrawQuad.Width;
                         Vector2 topCentre = (this.ScreenSpaceDrawQuad.TopLeft + this.ScreenSpaceDrawQuad.TopRight) / 2f;
-                        OnKeyHit?.Invoke(topCentre, currentColor, velocity);
+                        OnKeyHit?.Invoke(topCentre, keyWidth, currentColor, velocity);
                     }
 
                     break; 

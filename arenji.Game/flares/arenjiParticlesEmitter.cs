@@ -24,7 +24,7 @@ namespace arenji.Game.particles
         /// <summary>
         /// Fires a burst of particles. Connect your UI settings directly to these parameters!
         /// </summary>
-        public void Emit(Vector2 startPosition, Color4 color, int particleCount, double lifetimeMs, float speedMultiplier, float turbulence, float particleSize)
+        public void Emit(Vector2 startPosition, Color4 color, float emitWidth, int particleCount, double lifetimeMs, float speedMultiplier, float turbulence, float particleSize)
         {
             for (int i = 0; i < particleCount; i++)
             {
@@ -36,9 +36,11 @@ namespace arenji.Game.particles
                 
                 Vector2 velocity = new Vector2(0, -finalSpeed);
 
-                double randomizedLifetime = lifetimeMs * (0.8 + (rng.NextDouble() * 0.4)); 
+                double randomizedLifetime = lifetimeMs * (0.8 + (rng.NextDouble() * 0.4));
+                float randomOffset = (float)((rng.NextDouble() - 0.5) * emitWidth);
+                Vector2 randomizedStartPos = new Vector2(startPosition.X + randomOffset, startPosition.Y);
 
-                particle.Fire(startPosition, velocity, color, randomizedLifetime, turbulence, particleSize);
+                particle.Fire(randomizedStartPos, velocity, color, randomizedLifetime, turbulence, particleSize);
             }
         }
     }
