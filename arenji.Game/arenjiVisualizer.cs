@@ -74,15 +74,17 @@ namespace arenji.Game
                 RelativeSizeAxes = Axes.X, Height = 120
             };
             particleLayer = new ParticleEmitter();
-            keyboard.OnKeyHit = (position, keyWidth, color, velocity) => 
+            keyboard.OnKeyHit = (hitKey, position, keyWidth, color, velocity) => 
             {
-                int count = (int)(velocity / 10f);
-                if (count < 5) count = 5;
                 double userLifetime = settingsPanel.ParticleLifeTime.Value * 1000;
                 float userSpeed = settingsPanel.ParticleSpeed.Value;
                 float userTurbulence = settingsPanel.ParticleTurbulance.Value;
                 float userSize = settingsPanel.ParticleSize.Value;
                 int userCount = (int)settingsPanel.ParticleCount.Value;
+                float userRayOpacity = settingsPanel.RayOpacity.Value;
+                float userBulbOpacity = settingsPanel.BulbOpacity.Value;
+                float userBulbSize = keyWidth * settingsPanel.BulbSize.Value;
+                hitKey.FlashGlow(color, userRayOpacity, userBulbOpacity, userBulbSize);
 
                 particleLayer.Emit(position, color, keyWidth, userCount, userLifetime, userSpeed, userTurbulence, userSize);
             };

@@ -46,7 +46,6 @@ namespace arenji.Game.particles
             Colour = color; 
             Alpha = startingAlpha;
 
-            // Soft fade out over its lifetime
             this.FadeOut(lifetimeMs, Easing.InQuad).Expire(); 
         }
 

@@ -2,6 +2,7 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 
@@ -21,6 +22,7 @@ namespace arenji.Game
         [BackgroundDependencyLoader]
         private void load()
         {
+            Resources.AddStore(new DllResourceStore(typeof(arenji.Resources.arenjiResources).Assembly));
             Child = new ArenjiKeyBindingContainer
             {
                 RelativeSizeAxes = Axes.Both,

@@ -15,7 +15,7 @@ namespace arenji.Game
         private const int MAX_MIDI_PITCH = 108; 
         private const int TOTAL_WHITE_KEYS = 52;
         
-        public Action<Vector2, float, Color4, int> OnKeyHit;
+        public Action<PianoKey, Vector2, float, Color4, int> OnKeyHit;
 
         private Dictionary<int, PianoKey> keysByPitch = new Dictionary<int, PianoKey>();
 
@@ -33,7 +33,7 @@ namespace arenji.Game
                     Depth = isBlack ? -1 : 0 
                 };
 
-                key.OnKeyHit = (pos, width, color, velocity) => OnKeyHit?.Invoke(pos, width, color, velocity);
+                key.OnKeyHit = (hitKey, pos, width, color, velocity) => OnKeyHit?.Invoke(hitKey, pos, width, color, velocity);
 
                 if (!isBlack)
                 {
