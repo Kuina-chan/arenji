@@ -13,10 +13,7 @@ namespace arenji.Game
     public partial class arenjiPlaybackControl : FillFlowContainer, IKeyBindingHandler<ArenjiAction>
     {
         private IArenjiAudioEngine audioEngine;
-        
-        // THE NEW ADDITION: Hold a reference to the secondary backing track!
         private Track backingTrack; 
-        
         public readonly BindableDouble SeekBindable = new BindableDouble { MinValue = 0, MaxValue = 10000 };
         private BasicButton playPauseButton;
 
@@ -44,15 +41,14 @@ namespace arenji.Game
                 new BasicSliderBar<double>
                 {
                     RelativeSizeAxes = Axes.None,
-                    Width = 500,
+                    Width = 1000,
                     Height = 30,
                     Current = SeekBindable,
-                    BackgroundColour = Color4.Black,
-                    SelectionColour = Color4.Cyan
+                    BackgroundColour = Color4.Lavender,
+                    SelectionColour = Color4.DarkBlue
                 }
             };
 
-            // THE FIX: Seek BOTH engines when the user drags the slider!
             SeekBindable.ValueChanged += e =>
             {
                 if (audioEngine == null || isUpdatingFromClock) return;
@@ -72,7 +68,6 @@ namespace arenji.Game
             playPauseButton.BackgroundColour = Color4.DarkRed;
         }
 
-        // THE NEW METHOD: Allows the visualizer to hand over the backing track
         public void LinkBackingTrack(Track track)
         {
             backingTrack = track;
@@ -82,7 +77,6 @@ namespace arenji.Game
         {
             if (audioEngine == null || !audioEngine.IsReady) return;
 
-            // THE FIX: Pause and Play BOTH engines simultaneously!
             if (audioEngine.AudioClock.IsRunning)
             {
                 audioEngine.Pause();
