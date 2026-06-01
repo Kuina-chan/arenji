@@ -19,7 +19,6 @@ namespace arenji.Game
         public Action<PianoKey, Vector2, float, Color4, int> OnKeyHit;
         private Box visualBox;
         private Color4 idleColor;
-        private Color4 litColor;
         private List<VisualNoteData> activeNotes = new List<VisualNoteData>();
 
         public PianoKey(int pitch, bool isBlack)
