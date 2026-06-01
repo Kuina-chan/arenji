@@ -8,6 +8,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osuTK.Graphics;
 using osuTK;
+using arenji.Game.Tooltips;
 using System;
 
 namespace arenji.Game
@@ -230,7 +231,7 @@ namespace arenji.Game
             return modeCycleButton;
         }
 
-        private Drawable createLabeledSlider(string labelText, BindableFloat bindable)
+        private Drawable createLabeledSlider(string labelText, BindableFloat bindable, string tooltip = "")
         {
             var textBox = new BasicTextBox
             {
@@ -268,7 +269,7 @@ namespace arenji.Game
                 }
             }, true); 
 
-            return new FillFlowContainer
+            var contentContainer = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -296,6 +297,22 @@ namespace arenji.Game
                     }
                 }
             };
+
+            var wrapper = new Container
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Child = contentContainer
+            };
+
+            // 3. If a tooltip string was provided, drop the smart overlay over the wrapper!
+            if (!string.IsNullOrEmpty(tooltip))
+            {
+                wrapper.Add(new SmartSliderTooltip(tooltip, bindable));
+            }
+
+            // 4. Return the fully wrapped component
+            return wrapper;
         }
 
         private Drawable createLabeledTextBox(string label, string placeholder, Action<string> onTextChanged)
