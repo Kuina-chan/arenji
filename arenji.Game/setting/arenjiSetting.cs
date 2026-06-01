@@ -29,7 +29,6 @@ namespace arenji.Game
         public readonly BindableFloat ParticleSize = new BindableFloat(26f) {MinValue = 0f, MaxValue = 40f};
         public readonly BindableFloat ParticleCount = new BindableFloat(10) {MinValue = 0f, MaxValue = 100f, Precision = 1f};
         public readonly BindableFloat KeyGlowOpacity = new BindableFloat(0.5f) {MinValue = 0f, MaxValue = 1f};
-        public readonly BindableFloat RayOpacity = new BindableFloat(1f) {MinValue = 0f, MaxValue = 1f};
         public readonly BindableFloat BulbOpacity = new BindableFloat(0.8f) {MinValue = 0f, MaxValue = 1f};
         public readonly BindableFloat BulbSize = new BindableFloat(2.5f) {MinValue = 0f, MaxValue = 5f};
         public readonly BindableBool MuteSoundfont = new BindableBool(false);
@@ -191,7 +190,6 @@ namespace arenji.Game
                                     {
                                         Text = "Keyboard Setting", Font = FrameworkFont.Regular.With(size: 24), Colour = Color4.Cyan, Margin = new MarginPadding { Top = 20, Bottom = 5 }
                                     },
-                                    //createLabeledSlider("Ray Opacity", RayOpacity),
                                     createLabeledSlider("Bulb Opacity", BulbOpacity),
                                     createLabeledSlider("Bulb Size", BulbSize)
                                 }

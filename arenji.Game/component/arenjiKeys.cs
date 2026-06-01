@@ -15,7 +15,6 @@ namespace arenji.Game
     {
         public readonly int MidiPitch;
         public readonly bool IsBlack;
-        private Sprite lightRay;
         private Sprite lightBulb;
         public Action<PianoKey, Vector2, float, Color4, int> OnKeyHit;
         private Box visualBox;
@@ -34,14 +33,6 @@ namespace arenji.Game
         {
             idleColor = IsBlack ? Color4.Black : new Color4(220, 220, 220, 255); 
 
-            lightRay = new Sprite
-            {
-                Texture = textures.Get("r"),
-                RelativeSizeAxes = Axes.Both,
-                Blending = BlendingParameters.Additive,
-                Alpha = 0f
-            };
-
             lightBulb = new Sprite
             {
                 Texture = textures.Get("p"),
@@ -52,13 +43,13 @@ namespace arenji.Game
             };
             InternalChildren = new Drawable[]
             {
+                lightBulb,
                 visualBox = new Box 
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = idleColor
                 },
-                lightRay,
-                lightBulb,              
+                              
                 new Box
                 {
                     RelativeSizeAxes = Axes.Y,
@@ -73,17 +64,13 @@ namespace arenji.Game
 
         public void ClearNotes() => activeNotes.Clear();
         public void LoadNotes(IEnumerable<VisualNoteData> notes) => activeNotes.AddRange(notes);
-        public void FlashGlow(Color4 noteColor, float rayOpacity, float bulbOpacity, float bulbSize)
+        public void FlashGlow(Color4 noteColor, float bulbOpacity, float bulbSize)
         {
             Schedule(() =>
             {
-                lightBulb.ClearTransforms();
-            lightRay.ClearTransforms();
-            lightRay.Colour = noteColor;
+            lightBulb.ClearTransforms();
             lightBulb.Colour = noteColor;
             lightBulb.Size = new Vector2(bulbSize);
-
-            lightRay.FadeTo(rayOpacity).Then().FadeOut(200, Easing.OutQuint);
             lightBulb.FadeTo(bulbOpacity).Then().FadeOut(200, Easing.OutQuint);
             });
         }

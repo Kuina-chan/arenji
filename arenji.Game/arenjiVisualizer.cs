@@ -81,10 +81,9 @@ namespace arenji.Game
                 float userTurbulence = settingsPanel.ParticleTurbulance.Value;
                 float userSize = settingsPanel.ParticleSize.Value;
                 int userCount = (int)settingsPanel.ParticleCount.Value;
-                float userRayOpacity = settingsPanel.RayOpacity.Value;
                 float userBulbOpacity = settingsPanel.BulbOpacity.Value;
                 float userBulbSize = keyWidth * settingsPanel.BulbSize.Value;
-                hitKey.FlashGlow(color, userRayOpacity, userBulbOpacity, userBulbSize);
+                hitKey.FlashGlow(color, userBulbOpacity, userBulbSize);
 
                 particleLayer.Emit(position, color, keyWidth, userCount, userLifetime, userSpeed, userTurbulence, userSize);
             };
