@@ -56,6 +56,10 @@ namespace arenji.Game
                 $"ParticleSize={settingsPanel.ParticleSize.Value}",
                 $"ParticleCount={settingsPanel.ParticleCount.Value}",
                 "",
+                "[Keyboard Setting]",
+                $"BulbOpacity{settingsPanel.BulbOpacity.Value}",
+                $"BulbSize={settingsPanel.BulbSize.Value}",
+                "",
                 "[TrackColors]"
             };
 
@@ -121,7 +125,7 @@ namespace arenji.Game
             if (!File.Exists(destPath) || sourceFilePath != destPath)
                 File.Copy(sourceFilePath, destPath, true);
 
-            CurrentBackingAudioPath = destPath;
+            CurrentBackingAudioPath = safeName;
             return destPath; 
         }
 
@@ -192,6 +196,11 @@ namespace arenji.Game
                     else if (key == "ParticleTurbulance") settingsPanel.ParticleTurbulance.Value = float.Parse(value);
                     else if (key == "ParticleSize") settingsPanel.ParticleSize.Value = float.Parse(value);
                     else if (key == "ParticleCount") settingsPanel.ParticleCount.Value = int.Parse(value);
+                }
+                else if (currentSection == "[Keyboard Setting]")
+                {
+                    if (key == "BulbOpacity") settingsPanel.BulbOpacity.Value = float.Parse(value);
+                    else if (key == "BulbSize") settingsPanel.BulbSize.Value = float.Parse(value);
                 }
                 
                 else if (currentSection == "[TrackColors]" && int.TryParse(key, out int tId))
