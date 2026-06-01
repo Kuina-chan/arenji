@@ -22,7 +22,6 @@ namespace arenji.Game
         {
             RelativeSizeAxes = Axes.Both;
 
-            // THE FIX: Build the button first so it exists in memory before the file selector fires!
             confirmButton = new BasicButton
             {
                 RelativeSizeAxes = Axes.None, Width = 280, Height = 40, Text = "Import Audio",
