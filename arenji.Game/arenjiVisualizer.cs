@@ -74,15 +74,18 @@ namespace arenji.Game
                 RelativeSizeAxes = Axes.X, Height = 120
             };
             particleLayer = new ParticleEmitter();
-            keyboard.OnKeyHit = (position, color, velocity) => 
+            keyboard.OnKeyHit = (hitKey, position, keyWidth, color, velocity) => 
             {
-                int count = (int)(velocity / 10f);
-                if (count < 5) count = 5;
                 double userLifetime = settingsPanel.ParticleLifeTime.Value * 1000;
                 float userSpeed = settingsPanel.ParticleSpeed.Value;
                 float userTurbulence = settingsPanel.ParticleTurbulance.Value;
+                float userSize = settingsPanel.ParticleSize.Value;
+                int userCount = (int)settingsPanel.ParticleCount.Value;
+                float userBulbOpacity = settingsPanel.BulbOpacity.Value;
+                float userBulbSize = keyWidth * settingsPanel.BulbSize.Value;
+                hitKey.FlashGlow(color, userBulbOpacity, userBulbSize);
 
-                particleLayer.Emit(position, color, count, userLifetime, userSpeed, userTurbulence);
+                particleLayer.Emit(position, color, keyWidth, userCount, userLifetime, userSpeed, userTurbulence, userSize);
             };
             controlPanel = new arenjiPlaybackControl { Anchor = Anchor.TopLeft, Origin = Anchor.TopLeft };
             
@@ -197,8 +200,8 @@ namespace arenji.Game
                 //new Box { RelativeSizeAxes = Axes.Both, Colour = Color4.Black },
                 backgroundLayer,
                 noteCanvas,
-                keyboard,
                 particleLayer,
+                keyboard,
                 controlPanel,
                 settingsPanel,
                 advancedColorOverlay,
@@ -499,5 +502,13 @@ namespace arenji.Game
         }
 
         public void OnReleased(KeyBindingReleaseEvent<ArenjiAction> e) { }
+        protected override void Update()
+        {
+            base.Update();
+            if (activeAudioEngine != null && activeAudioEngine.AudioClock != null)
+            {
+                particleLayer.Alpha = activeAudioEngine.AudioClock.IsRunning ? 1f : 0f;
+            }
+        }
     }
 }
