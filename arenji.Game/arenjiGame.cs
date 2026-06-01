@@ -2,6 +2,7 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
@@ -23,16 +24,18 @@ namespace arenji.Game
         private void load()
         {
             Resources.AddStore(new DllResourceStore(typeof(arenji.Resources.arenjiResources).Assembly));
-            Child = new ArenjiKeyBindingContainer
+            activeVisualizer = new arenjiVisualizer();
+            Child = new TooltipContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = screenStack = new ScreenStack()
+                Child = new ArenjiKeyBindingContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = screenStack = new ScreenStack()
+                }         
             };
-            
-            activeVisualizer = new arenjiVisualizer();
-            
-
             screenStack.Push(activeVisualizer);
+
         }
 
         public override void SetHost(GameHost host)
