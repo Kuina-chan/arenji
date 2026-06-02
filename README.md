@@ -1,4 +1,4 @@
-# Areji MIDI visualizer
+# Arenji MIDI visualizer
 [![Discord](https://discordapp.com/api/guilds/1283308435902824499/widget.png?style=shield)](https://discord.gg/VHVj4JpmdP)
 
 A MIDI visualizer based on [osu-framework](https://github.com/ppy/osu-framework)
