@@ -156,7 +156,7 @@ namespace arenji.Game
                                     },
                                     BackgroundImport,
                                     createLabeledSlider("Background Opacity", BackgroundOpacity),
-                                    createLabeledSlider("Background Offset (s)", BackgroundOffset),
+                                    createLabeledSlider("Video Background Offset (s)", BackgroundOffset),
                                     new SpriteText { Text = "Audio Settings", Font = FrameworkFont.Regular.With(size: 24), Colour = Color4.Cyan, Margin = new MarginPadding { Top = 20, Bottom = 5 } },
                                     new BasicButton
                                     {
