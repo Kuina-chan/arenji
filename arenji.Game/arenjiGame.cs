@@ -41,7 +41,7 @@ namespace arenji.Game
         public override void SetHost(GameHost host)
         {
             base.SetHost(host);
-            host.Window.DragDrop += handleDragDrop;
+            if (host.Window != null) host.Window.DragDrop += handleDragDrop;
         }
 
         protected override void LoadComplete()
