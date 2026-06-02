@@ -1,18 +1,20 @@
+using System;
+using arenji.Game.UI;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osuTK.Graphics;
 using osuTK;
-using System;
+using osuTK.Graphics;
 
 namespace arenji.Game
 {
     public partial class arenjiAdvancedColorOverlay : FocusedOverlayContainer
     {
         private FillFlowContainer colorRowsContainer;
+        public arenjiColorPickerOverlay ColorPicker;
         private SpriteText titleText;
         private NoteColorMode activeMode;
 
@@ -137,12 +139,31 @@ namespace arenji.Game
         // The UI helper that creates the label, the text box, AND the preview square!
         private Drawable createColorRow(string label, Color4 initialColor, Action<Color4> onColorChanged)
         {
-            // 1. Build the square FIRST so the compiler knows it exists!
-            var previewSquare = new Box { Width = 30, Height = 30, Colour = initialColor };
+            var previewSquare = new Box { RelativeSizeAxes = Axes.Both, Colour = initialColor };
 
-            var textBox = new BasicTextBox { Width = 200, Height = 30, PlaceholderText = "Hex or RGB", Text = ArenjiColorManager.ToHex(initialColor) };
-            
-            // 2. Now the text box can safely talk to the square
+            var textBox = new BasicTextBox { Width = 180, Height = 30, PlaceholderText = "Hex or RGB", Text = ArenjiColorManager.ToHex(initialColor) };
+            var colorButton = new ClickableContainer
+            {
+                Size = new Vector2(30, 30),
+                Masking = true, CornerRadius = 3,
+                Child = previewSquare,
+                Action = () =>
+                {
+                    previewSquare.FlashColour(Color4.White, 500, Easing.OutQuint);
+                    
+                    if (ColorPicker != null)
+                    {
+                        ColorPicker.OnColorConfirmed = (newColor) =>
+                        {
+                            previewSquare.Colour = newColor;
+                            textBox.Text = ArenjiColorManager.ToHex(newColor);
+                            onColorChanged?.Invoke(newColor);
+                        };
+                        ColorPicker.Show();
+                    }
+                }
+            };
+
             textBox.Current.ValueChanged += e => 
             {
                 Color4 parsed = ArenjiColorManager.ParseString(e.NewValue, initialColor);
@@ -150,23 +171,21 @@ namespace arenji.Game
                 onColorChanged?.Invoke(parsed); 
             };
 
-            return new GridContainer
+            return new FillFlowContainer
             {
-                RelativeSizeAxes = Axes.X, Height = 30,
-                ColumnDimensions = new[]
+                RelativeSizeAxes = Axes.X, 
+                Height = 30,
+                Direction = FillDirection.Horizontal,
+                Spacing = new Vector2(15, 0),
+                Children = new Drawable[]
                 {
-                    new Dimension(GridSizeMode.Absolute, 100), 
-                    new Dimension(GridSizeMode.Absolute, 210), 
-                    new Dimension(GridSizeMode.AutoSize)       
-                },
-                Content = new[]
-                {
-                    new Drawable[]
-                    {
-                        new SpriteText { Text = label, Anchor = Anchor.CentreLeft, Origin = Anchor.CentreLeft },
-                        textBox,
-                        previewSquare
-                    }
+                    new Container 
+                    { 
+                        Width = 80, Height = 30, 
+                        Child = new SpriteText { Text = label, Anchor = Anchor.CentreLeft, Origin = Anchor.CentreLeft } 
+                    },
+                    textBox,
+                    colorButton
                 }
             };
         }
