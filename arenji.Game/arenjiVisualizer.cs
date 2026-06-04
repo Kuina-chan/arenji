@@ -17,7 +17,6 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osuTK.Graphics;
-using arenji.Game.UI;
 
 namespace arenji.Game
 {
