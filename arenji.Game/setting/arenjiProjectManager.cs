@@ -57,8 +57,13 @@ namespace arenji.Game
                 $"ParticleCount={settingsPanel.ParticleCount.Value}",
                 "",
                 "[Keyboard Setting]",
-                $"BulbOpacity{settingsPanel.BulbOpacity.Value}",
+                $"BulbOpacity={settingsPanel.BulbOpacity.Value}",
                 $"BulbSize={settingsPanel.BulbSize.Value}",
+                "",
+                "[Saber Setting]",
+                $"SaberColor={ArenjiColorManager.ToHex(settingsPanel.SaberColor.Value)}",
+                $"SaberOpacity={settingsPanel.SaberOpacity.Value}",
+                $"SaberBrightness={settingsPanel.SaberBrightness.Value}",
                 "",
                 "[TrackColors]"
             };
@@ -201,6 +206,15 @@ namespace arenji.Game
                 {
                     if (key == "BulbOpacity") settingsPanel.BulbOpacity.Value = float.Parse(value);
                     else if (key == "BulbSize") settingsPanel.BulbSize.Value = float.Parse(value);
+                }
+                else if (currentSection == "[Saber Setting]")
+                {
+                    if (key == "SaberColor")
+                    {
+                        settingsPanel.SaberColor.Value = ArenjiColorManager.ParseString(value, Color4.Navy);
+                    }
+                    else if (key == "SaberOpacity") settingsPanel.SaberOpacity.Value = float.Parse(value);
+                    else if (key == "SaberBrightness") settingsPanel.SaberBrightness.Value = float.Parse(value);
                 }
                 
                 else if (currentSection == "[TrackColors]" && int.TryParse(key, out int tId))

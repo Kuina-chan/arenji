@@ -17,6 +17,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osuTK.Graphics;
+using arenji.Game.UI;
 
 namespace arenji.Game
 {
@@ -41,26 +42,14 @@ namespace arenji.Game
         private arenjiProjectSelector projectSelector;
         private ParticleEmitter particleLayer;
         private arenjiColorPickerOverlay colorPickerOverlay;
+        private arenjiSaberLayer saberLayer;
         [osu.Framework.Allocation.Resolved]
         private AudioManager osuAudioManager { get; set; }
         [osu.Framework.Allocation.Resolved]
         private osu.Framework.Platform.GameHost host { get; set; }
         [osu.Framework.Allocation.Resolved]
         private AudioManager globalAudioManager { get; set; }
-        private void applyMasterVolumes()
-        {
-            // Apply Soundfont Volume
-            if (activeAudioEngine != null)
-            {
-                activeAudioEngine.Volume = settingsPanel.MuteSoundfont.Value ? 0 : settingsPanel.SoundFontVolume.Value;
-            }
-
-            // Apply Backing Track Volume
-            if (backingTrack != null)
-            {
-                backingTrack.Volume.Value = settingsPanel.MuteBackingAudio.Value ? 0 : settingsPanel.BackingAudioVolume.Value;
-            }
-        }
+        
         [BackgroundDependencyLoader]    
         private void load()
         {
@@ -89,6 +78,14 @@ namespace arenji.Game
 
                 particleLayer.Emit(position, color, keyWidth, userCount, userLifetime, userSpeed, userTurbulence, userSize);
             };
+            Action updateSaberGraphics = () => 
+            {
+                saberLayer.UpdateSaber(
+                    settingsPanel.SaberColor.Value, 
+                    settingsPanel.SaberOpacity.Value, 
+                    settingsPanel.SaberBrightness.Value
+                );
+            };
             controlPanel = new arenjiPlaybackControl { Anchor = Anchor.TopLeft, Origin = Anchor.TopLeft };
             
             settingsPanel = new arenjiSettings { State = { Value = Visibility.Hidden } };
@@ -102,6 +99,7 @@ namespace arenji.Game
             bgSelector = new arenjiBackgroundSelector();
             projectSelector = new arenjiProjectSelector();
             audioSelector = new arenjiAudioSelector();
+            saberLayer = new arenjiSaberLayer();
             settingsPanel.OnRequestAudioImport = () => audioSelector.Show();
             audioSelector.OnFileSelected = (filePath) => 
             {
@@ -114,10 +112,22 @@ namespace arenji.Game
             settingsPanel.MuteBackingAudio.BindValueChanged(_ => applyMasterVolumes(), true);
             settingsPanel.SoundFontVolume.BindValueChanged(_ => applyMasterVolumes(), true);
             settingsPanel.BackingAudioVolume.BindValueChanged(_ => applyMasterVolumes(), true);
+            settingsPanel.SaberColor.BindValueChanged(_ => updateSaberGraphics(), true);
+            settingsPanel.SaberOpacity.BindValueChanged(_ => updateSaberGraphics(), true);
+            settingsPanel.SaberBrightness.BindValueChanged(_ => updateSaberGraphics(), true);
             settingsPanel.OnRequestImport = () => projectSelector.Show();
             settingsPanel.OnRequestAdvancedColors = (mode) => advancedColorOverlay.OpenForMode(mode);
             settingsPanel.OnRequestImport = () => importPrompt.Show();
             settingsPanel.OnRequestBackgroundChange = () => bgSelector.Show();
+            settingsPanel.OnRequestSaberColor = () => 
+            {
+                colorPickerOverlay.OnColorConfirmed = (newColor) => 
+                {
+                    settingsPanel.SaberColor.Value = newColor; 
+                };
+                
+                colorPickerOverlay.Show();
+            };
             settingsPanel.BackgroundOpacity.ValueChanged += e => 
             {
                 backgroundLayer.Alpha = e.NewValue;
@@ -205,6 +215,7 @@ namespace arenji.Game
                 backgroundLayer,
                 noteCanvas,
                 particleLayer,
+                saberLayer,
                 keyboard,
                 controlPanel,
                 settingsPanel,
@@ -217,6 +228,21 @@ namespace arenji.Game
                 projectSelector,
                 loadingOverlay
             };
+        }
+
+        private void applyMasterVolumes()
+        {
+            // Apply Soundfont Volume
+            if (activeAudioEngine != null)
+            {
+                activeAudioEngine.Volume = settingsPanel.MuteSoundfont.Value ? 0 : settingsPanel.SoundFontVolume.Value;
+            }
+
+            // Apply Backing Track Volume
+            if (backingTrack != null)
+            {
+                backingTrack.Volume.Value = settingsPanel.MuteBackingAudio.Value ? 0 : settingsPanel.BackingAudioVolume.Value;
+            }
         }
 
         public void ApplyBackground(string filename)
