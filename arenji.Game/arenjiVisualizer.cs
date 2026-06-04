@@ -1,21 +1,22 @@
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Screens;
-using osu.Framework.Graphics.Shapes;
-using osuTK.Graphics;
-using osu.Framework.Input.Events;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Audio;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using arenji.Game.particles;
+using arenji.Game.UI;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
-using arenji.Game.particles;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
+using osu.Framework.Screens;
+using osuTK.Graphics;
 
 namespace arenji.Game
 {
@@ -39,6 +40,7 @@ namespace arenji.Game
         private osu.Framework.Audio.Track.Track backingTrack;
         private arenjiProjectSelector projectSelector;
         private ParticleEmitter particleLayer;
+        private arenjiColorPickerOverlay colorPickerOverlay;
         [osu.Framework.Allocation.Resolved]
         private AudioManager osuAudioManager { get; set; }
         [osu.Framework.Allocation.Resolved]
@@ -91,6 +93,8 @@ namespace arenji.Game
             
             settingsPanel = new arenjiSettings { State = { Value = Visibility.Hidden } };
             advancedColorOverlay = new arenjiAdvancedColorOverlay();
+            colorPickerOverlay = new arenjiColorPickerOverlay();
+            advancedColorOverlay.ColorPicker = colorPickerOverlay;
             projectPrompt = new arenjiProjectPrompt();
             importPrompt = new arenjiImportPrompt();
             loadingOverlay = new arenjiLoadingOverlay();
@@ -205,6 +209,7 @@ namespace arenji.Game
                 controlPanel,
                 settingsPanel,
                 advancedColorOverlay,
+                colorPickerOverlay,
                 projectPrompt,
                 importPrompt,
                 bgSelector,
