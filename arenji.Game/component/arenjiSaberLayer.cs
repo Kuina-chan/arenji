@@ -4,7 +4,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Video;
-using osu.Framework.IO.Stores;
 using osuTK.Graphics;
 
 namespace arenji.Game
