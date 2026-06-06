@@ -20,3 +20,5 @@ If you using AI to vibecode or debug a new problem, please make sure that **you*
 
 ## License:
 The [MeltySynth](https://github.com/sinshu/meltysynth), [osu-framework](https://github.com/ppy/osu-framework) and [DryWetMidi](https://github.com/melanchall/drywetmidi) is licensed under MIT License
+
+This software itself licensed under GPL v3
