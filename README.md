@@ -13,6 +13,12 @@ First of all, from the bottom of my heart, thank you so much for paying attentio
 - A desktop platform with the [.NET 8.0 SDK](https://dotnet.microsoft.com/download)
 - An IDE with intellisense and syntax highlighting.
 
+##Running a branch for testing:
+```sh
+git clone https://github.com/Kuina-chan/arenji <branch>
+cd arenji
+dotnet build
+```
 ## Contributing:
 Contributions are welcomed here, via pull requests.
 Please first check out the [opened issues](https://github.com/Kuina-chan/arenji/issues). Some of them are denoted with [Suggestion], some are [Bugs]. The Bugs are more important to resolve.
