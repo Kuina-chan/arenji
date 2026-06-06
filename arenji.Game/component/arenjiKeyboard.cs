@@ -23,12 +23,17 @@ namespace arenji.Game
         private void load()
         {
             int whiteKeyIndex = 0;
+            var whiteKeyTexture = arenjiSkinManager.SkinTextures?.Get("skin/keyWhite");
+            var darkKeyTexture = arenjiSkinManager.SkinTextures?.Get("skin/keyDark");
 
             for (int pitch = MIN_MIDI_PITCH; pitch <= MAX_MIDI_PITCH; pitch++)
             {
                 bool isBlack = isBlackKey(pitch);
 
-                PianoKey key = new PianoKey(pitch, isBlack)
+                // 2. Pass the correct texture down to the key!
+                var keyTexture = isBlack ? darkKeyTexture : whiteKeyTexture;
+
+                PianoKey key = new PianoKey(pitch, isBlack, keyTexture) // <-- Added keyTexture here
                 {
                     Depth = isBlack ? -1 : 0 
                 };

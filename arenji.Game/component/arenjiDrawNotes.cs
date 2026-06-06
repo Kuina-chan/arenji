@@ -2,6 +2,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osuTK.Graphics;
 
 namespace arenji.Game
@@ -18,21 +19,22 @@ namespace arenji.Game
         public int ChannelIndex;
         public bool HasHit { get; set; }
     }
-
     public partial class DrawableMidiNote : CompositeDrawable
     {
         private readonly VisualNoteData data;
-        private readonly arenjiSettings settings; // 1. Save a reference to the settings
+        private readonly arenjiSettings settings;
         
         private const float SCROLL_SPEED = 0.5f; 
         private const int TOTAL_WHITE_KEYS = 52;
-        private Box visualBox; 
+        private Drawable noteVisual;
 
-        // 2. Add arenjiSettings to the constructor
         public DrawableMidiNote(VisualNoteData data, arenjiSettings settings)
         {
             this.data = data;
             this.settings = settings;
+
+            Anchor = Anchor.BottomLeft;
+            Origin = Anchor.BottomCentre; 
             Depth = data.IsBlackKey ? -1 : 0;
         }
 
@@ -40,37 +42,39 @@ namespace arenji.Game
         private void load()
         {
             AlwaysPresent = true; 
-
-            // 3. Changed Origin to BottomCentre so notes shrink inward instead of leftward!
-            Anchor = Anchor.BottomLeft;
-            Origin = Anchor.BottomCentre; 
-            
-            Height = (float)data.DurationMs * SCROLL_SPEED;
             RelativePositionAxes = Axes.X;
             RelativeSizeAxes = Axes.X;
-            
-            // 4. Updated X Math to target the exact center of the keys
-            float whiteWidth = 1f / TOTAL_WHITE_KEYS;
-            if (!data.IsBlackKey)
+            Height = (float)data.DurationMs * SCROLL_SPEED;
+            Masking = true; 
+
+            Color4 myNoteColor = ArenjiColorManager.GetColorForNote(data);
+
+            var noteTexture = arenjiSkinManager.SkinTextures?.Get("skin/note");
+
+            if (noteTexture != null)
             {
-                X = (data.WhiteKeyIndex * whiteWidth) + (whiteWidth / 2f);
+                noteVisual = new Sprite
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Texture = noteTexture,
+                    Colour = myNoteColor 
+                };
             }
             else
             {
-                X = (data.WhiteKeyIndex * whiteWidth);
+                noteVisual = new Box 
+                { 
+                    RelativeSizeAxes = Axes.Both, 
+                    Colour = myNoteColor 
+                };
             }
 
-            InternalChild = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Masking = true, // REQUIRED for corner radius to work!
-                Child = visualBox = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = data.IsBlackKey ? Color4.DarkCyan : Color4.Cyan, 
-                    Alpha = 0.8f 
-                }
-            };
+            InternalChild = noteVisual;
+
+            float whiteWidth = 1f / TOTAL_WHITE_KEYS;
+            X = data.IsBlackKey 
+                ? (data.WhiteKeyIndex * whiteWidth) 
+                : (data.WhiteKeyIndex * whiteWidth) + (whiteWidth / 2f);
 
             if (!data.IsBlackKey)
             {
@@ -81,17 +85,26 @@ namespace arenji.Game
                 settings.BlackNoteWidth.BindValueChanged(e => Width = whiteWidth * e.NewValue, true);
             }
 
-            // We apply the corner radius to the Container wrapping the Box
-            settings.NoteRoundness.BindValueChanged(e => ((Container)InternalChild).CornerRadius = e.NewValue, true);
+            settings.NoteRoundness.BindValueChanged(e => CornerRadius = e.NewValue, true);
         }
 
         protected override void Update()
         {
             base.Update();
+            
+            // Move the note
             Y = (float)((Clock.CurrentTime - data.StartTimeMs) * SCROLL_SPEED);
-            visualBox.Colour = ArenjiColorManager.GetColorForNote(data);
-            if (Y > Height) visualBox.Alpha = 0; 
-            else visualBox.Alpha = 0.8f; 
+
+            noteVisual.Colour = ArenjiColorManager.GetColorForNote(data);
+
+            if (Y > Height) 
+            {
+                this.Alpha = 0f; 
+            }
+            else 
+            {
+                this.Alpha = ArenjiColorManager.GlobalOpacity; 
+            }
         }
     }
 }

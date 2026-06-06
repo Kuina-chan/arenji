@@ -2,6 +2,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Pooling;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites; // Added for Sprite
 using osuTK;
 using osuTK.Graphics;
 using System;
@@ -24,11 +25,27 @@ namespace arenji.Game.particles
             // It makes overlapping particles glow white-hot at the core.
             Blending = BlendingParameters.Additive;
 
-            InternalChild = new Circle
+            // 1. Fetch the custom particle skin!
+            var particleTexture = arenjiSkinManager.SkinTextures?.Get("skin/p");
+
+            if (particleTexture != null)
             {
-                RelativeSizeAxes = Axes.Both,
-                Colour = Color4.White
-            };
+                InternalChild = new Sprite
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Texture = particleTexture,
+                    // Note: We don't need to set Colour here because the parent PoolableDrawable will tint it!
+                };
+            }
+            else
+            {
+                // 2. Fallback to the default math circle
+                InternalChild = new Circle
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.White // Explicitly white so it tints perfectly
+                };
+            }
         }
 
         public void Fire(Vector2 startPosition, Vector2 initialVelocity, Color4 color, double lifetimeMs, float turbulence, float size)
@@ -43,6 +60,8 @@ namespace arenji.Game.particles
             
             float startingAlpha = depthScale > 1.2f ? 0.4f : 0.8f;
             
+            // 3. Color and Alpha are applied to the parent PoolableDrawable, 
+            // which safely cascades down to either the Sprite or the Circle!
             Colour = color; 
             Alpha = startingAlpha;
 

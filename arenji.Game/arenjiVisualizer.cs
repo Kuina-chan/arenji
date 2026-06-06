@@ -50,8 +50,9 @@ namespace arenji.Game
         private AudioManager globalAudioManager { get; set; }
         
         [BackgroundDependencyLoader]    
-        private void load()
+        private void load(osu.Framework.Platform.GameHost host)
         {
+            arenjiSkinManager.Initialize(host);
             noteCanvas = new Container
             {
                 RelativeSizeAxes = Axes.Both, Anchor = Anchor.BottomLeft, Origin = Anchor.BottomLeft,

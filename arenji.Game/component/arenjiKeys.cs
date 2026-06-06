@@ -15,46 +15,84 @@ namespace arenji.Game
     {
         public readonly int MidiPitch;
         public readonly bool IsBlack;
-        private Sprite lightBulb;
+        
+        // Changed to Drawable so we can swap between a Sprite (skin) or a Circle (fallback)
+        private Drawable lightBulb; 
+        
         public Action<PianoKey, Vector2, float, Color4, int> OnKeyHit;
-        private Box visualBox;
+        
         private Color4 idleColor;
+        private readonly Texture customTexture;
+        
+        // This fully replaces visualBox!
+        private Drawable keyVisual; 
+        
         private List<VisualNoteData> activeNotes = new List<VisualNoteData>();
 
-        public PianoKey(int pitch, bool isBlack)
+        public PianoKey(int pitch, bool isBlack, Texture customTexture = null)
         {
             MidiPitch = pitch;
-            IsBlack = isBlack;
+            IsBlack = isBlack; // Store the lowercase parameter into the uppercase property
+            this.customTexture = customTexture;
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load() // Removed the injected TextureStore so we can use our Skin Manager
         {
+            // Fixed the capitalization to use IsBlack
             idleColor = IsBlack ? Color4.Black : new Color4(220, 220, 220, 255); 
 
-            lightBulb = new Sprite
+            var bulbTexture = arenjiSkinManager.SkinTextures?.Get("skin/b"); // Change to "skin/p" if you prefer!
+            
+            if (bulbTexture != null)
             {
-                Texture = textures.Get("p"),
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.Centre,
-                Blending = BlendingParameters.Additive,
-                Alpha = 0f
-            };
-            InternalChildren = new Drawable[]
+                lightBulb = new Sprite
+                {
+                    Texture = bulbTexture,
+                    Anchor = Anchor.TopCentre, Origin = Anchor.Centre,
+                    Blending = BlendingParameters.Additive, Alpha = 0f
+                };
+            }
+            else
             {
-                lightBulb,
-                visualBox = new Box 
+                // Fallback math circle if the user has no custom bulb
+                lightBulb = new Circle
+                {
+                    Anchor = Anchor.TopCentre, Origin = Anchor.Centre,
+                    Blending = BlendingParameters.Additive, Alpha = 0f
+                };
+            }
+
+            // 2. Key Skinning Logic
+            if (customTexture != null)
+            {
+                keyVisual = new Sprite
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = idleColor
-                },
-                              
-                new Box
+                    Texture = customTexture,
+                    Colour = idleColor 
+                };
+            }
+            else
+            {
+                // Fallback box
+                keyVisual = new Box 
+                { 
+                    RelativeSizeAxes = Axes.Both, 
+                    Colour = idleColor 
+                };
+            }
+
+            // 3. Proper Hierarchy setup (No more overwriting!)
+            InternalChildren = new Drawable[]
+            {
+                keyVisual, // Draws the skin (or box) at the very bottom
+                lightBulb, // Draws the bulb on top of the key
+                new Box    // Draws the border last
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = 1,
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
+                    Anchor = Anchor.TopRight, Origin = Anchor.TopRight,
                     Colour = Color4.Black,
                     Alpha = IsBlack ? 0 : 0.5f 
                 }
@@ -63,16 +101,18 @@ namespace arenji.Game
 
         public void ClearNotes() => activeNotes.Clear();
         public void LoadNotes(IEnumerable<VisualNoteData> notes) => activeNotes.AddRange(notes);
+        
         public void FlashGlow(Color4 noteColor, float bulbOpacity, float bulbSize)
         {
             Schedule(() =>
             {
-            lightBulb.ClearTransforms();
-            lightBulb.Colour = noteColor;
-            lightBulb.Size = new Vector2(bulbSize);
-            lightBulb.FadeTo(bulbOpacity).Then().FadeOut(200, Easing.OutQuint);
+                lightBulb.ClearTransforms();
+                lightBulb.Colour = noteColor;
+                lightBulb.Size = new Vector2(bulbSize);
+                lightBulb.FadeTo(bulbOpacity).Then().FadeOut(200, Easing.OutQuint);
             });
         }
+        
         protected override void Update()
         {
             base.Update();
@@ -97,7 +137,6 @@ namespace arenji.Game
                         Vector2 topCentre = (this.ScreenSpaceDrawQuad.TopLeft + this.ScreenSpaceDrawQuad.TopRight) / 2f;
                         Color4 emitColor = currentColor;
 
-                        //in case the user goes tripping mode
                         if (emitColor == Color4.Black)
                         {
                             emitColor = Color4.White;
@@ -107,14 +146,14 @@ namespace arenji.Game
 
                     break; 
                 }
-                // 3. THE REWIND FIX: Reset the hit status if the user scrubs backward in the song!
                 else if (currentTime < note.StartTimeMs)
                 {
                     note.HasHit = false;
                 }
             }
 
-            visualBox.Colour = isCurrentlyLit ? currentColor : idleColor;
+            // 4. Tint the actual key visual instead of the deleted visualBox
+            keyVisual.Colour = isCurrentlyLit ? currentColor : idleColor;
         }
     }
 }
