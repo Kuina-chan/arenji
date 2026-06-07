@@ -20,12 +20,7 @@ namespace arenji.Game.particles
         private void load()
         {
             Origin = Anchor.Centre;
-            
-            // Additive blending is CRITICAL for this look. 
-            // It makes overlapping particles glow white-hot at the core.
             Blending = BlendingParameters.Additive;
-
-            // 1. Fetch the custom particle skin!
             var particleTexture = arenjiSkinManager.SkinTextures?.Get("skin/p");
 
             if (particleTexture != null)
@@ -34,16 +29,14 @@ namespace arenji.Game.particles
                 {
                     RelativeSizeAxes = Axes.Both,
                     Texture = particleTexture,
-                    // Note: We don't need to set Colour here because the parent PoolableDrawable will tint it!
                 };
             }
             else
             {
-                // 2. Fallback to the default math circle
                 InternalChild = new Circle
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.White // Explicitly white so it tints perfectly
+                    Colour = Color4.White
                 };
             }
         }
