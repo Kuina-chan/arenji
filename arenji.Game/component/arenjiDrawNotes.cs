@@ -56,16 +56,16 @@ namespace arenji.Game
 
             Color4 myNoteColor = ArenjiColorManager.GetColorForNote(data);
 
-            var headTexture = arenjiSkinManager.SkinTextures?.Get("Skins/noteHead");
+            var headTexture = arenjiSkinManager.SkinTextures?.Get("noteHead");
             
             // 1. THE MAGIC INGREDIENT: Ask for WrapMode.Repeat on the Y-Axis!
             var bodyTexture = arenjiSkinManager.SkinTextures?.Get(
-                "Skins/noteBody", 
+                "noteBody", 
                 WrapMode.ClampToEdge, // X-Axis (Don't repeat horizontally)
                 WrapMode.Repeat       // Y-Axis (Tile vertically!)
             );
             
-            var endTexture = arenjiSkinManager.SkinTextures?.Get("Skins/noteEnd");
+            var endTexture = arenjiSkinManager.SkinTextures?.Get("noteEnd");
 
             if (headTexture != null && bodyTexture != null && endTexture != null)
             {
@@ -105,13 +105,13 @@ namespace arenji.Game
                     }
                 };
             }
-            else if (arenjiSkinManager.SkinTextures?.Get("Skins/noteBody") != null)
+            else if (arenjiSkinManager.SkinTextures?.Get("noteBody") != null)
             {
                 // Note: We don't tile the 1-piece fallback, we just stretch it.
                 noteVisual = new Sprite
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Texture = arenjiSkinManager.SkinTextures.Get("Skins/noteBody")
+                    Texture = arenjiSkinManager.SkinTextures.Get("noteBody")
                 };
             }
             else
