@@ -34,16 +34,15 @@ namespace arenji.Game
         public readonly BindableFloat BulbSize = new BindableFloat(2.5f) {MinValue = 0f, MaxValue = 5f};
         public readonly BindableFloat SaberOpacity = new BindableFloat(1f) {MinValue = 0f, MaxValue = 1f};
         public readonly BindableFloat SaberBrightness = new BindableFloat(1f){MinValue = 0f, MaxValue = 2f, Precision = 0.1f};
+        public readonly BindableFloat ScrollSpeed = new BindableFloat(0.5f) {MinValue = 0.1f, MaxValue = 5f};
         public readonly Bindable<Color4> SaberColor = new Bindable<Color4>(Color4.Gold);
         public readonly BindableBool MuteSoundfont = new BindableBool(false);
         public readonly BindableBool MuteBackingAudio = new BindableBool(false);
         public Action OnRequestAudioImport;
         public Action OnRequestSaberColor;
-        
         public Action<NoteColorMode> OnRequestAdvancedColors;
         public Action OnRequestBackgroundChange;
         public Action OnRequestImport;
-        
         private FillFlowContainer solidSettingsGroup;
         private BasicButton advancedColorsButton;
         private BasicButton modeCycleButton;
@@ -208,7 +207,8 @@ namespace arenji.Game
                                         Action = () => OnRequestSaberColor?.Invoke()
                                     },
                                     createLabeledSlider("Saber Opacity", SaberOpacity),
-                                    createLabeledSlider("Saber Brightness", SaberBrightness)
+                                    createLabeledSlider("Saber Brightness", SaberBrightness),
+                                    createLabeledSlider("Scroll Speed", ScrollSpeed)
                                 }
                             }
                         }

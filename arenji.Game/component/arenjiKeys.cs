@@ -37,12 +37,11 @@ namespace arenji.Game
         }
 
         [BackgroundDependencyLoader]
-        private void load() // Removed the injected TextureStore so we can use our Skin Manager
+        private void load()
         {
-            // Fixed the capitalization to use IsBlack
             idleColor = IsBlack ? Color4.Black : new Color4(220, 220, 220, 255); 
 
-            var bulbTexture = arenjiSkinManager.SkinTextures?.Get("skin/b"); // Change to "skin/p" if you prefer!
+            var bulbTexture = arenjiSkinManager.SkinTextures?.Get("b");
             
             if (bulbTexture != null)
             {
@@ -82,12 +81,10 @@ namespace arenji.Game
                     Colour = idleColor 
                 };
             }
-
-            // 3. Proper Hierarchy setup (No more overwriting!)
             InternalChildren = new Drawable[]
             {
-                keyVisual, // Draws the skin (or box) at the very bottom
-                lightBulb, // Draws the bulb on top of the key
+                lightBulb, 
+                keyVisual,
                 new Box    // Draws the border last
                 {
                     RelativeSizeAxes = Axes.Y,

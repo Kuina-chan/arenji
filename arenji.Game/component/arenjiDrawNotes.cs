@@ -28,7 +28,6 @@ namespace arenji.Game
         private readonly VisualNoteData data;
         private readonly arenjiSettings settings;
         
-        private const float SCROLL_SPEED = 0.5f; 
         private const int TOTAL_WHITE_KEYS = 52;
         private const float DESIRED_CAP_HEIGHT = 20f; 
         
@@ -53,7 +52,6 @@ namespace arenji.Game
             AlwaysPresent = true; 
             RelativePositionAxes = Axes.X;
             RelativeSizeAxes = Axes.X;
-            Height = (float)data.DurationMs * SCROLL_SPEED;
             Masking = true; 
 
             Color4 myNoteColor = ArenjiColorManager.GetColorForNote(data);
@@ -62,7 +60,7 @@ namespace arenji.Game
             
             // 1. THE MAGIC INGREDIENT: Ask for WrapMode.Repeat on the Y-Axis!
             var bodyTexture = arenjiSkinManager.SkinTextures?.Get(
-                "skin/noteBody", 
+                "Skins/noteBody", 
                 WrapMode.ClampToEdge, // X-Axis (Don't repeat horizontally)
                 WrapMode.Repeat       // Y-Axis (Tile vertically!)
             );
@@ -71,7 +69,8 @@ namespace arenji.Game
 
             if (headTexture != null && bodyTexture != null && endTexture != null)
             {
-                float actualCapHeight = Math.Min(DESIRED_CAP_HEIGHT, Height / 2f);
+                float initialHeight = (float)data.DurationMs * settings.ScrollSpeed.Value;
+                float actualCapHeight = Math.Min(DESIRED_CAP_HEIGHT, initialHeight / 2f);
 
                 // Initialize the body sprite and save it to our variable
                 bodySprite = new Sprite
@@ -132,17 +131,22 @@ namespace arenji.Game
             else settings.BlackNoteWidth.BindValueChanged(e => Width = whiteWidth * e.NewValue, true);
 
             settings.NoteRoundness.BindValueChanged(e => CornerRadius = e.NewValue, true);
+            
+            // Re-added the dynamic height binding here!
+            settings.ScrollSpeed.BindValueChanged(e => Height = (float)data.DurationMs * e.NewValue, true);
         }
 
         protected override void Update()
         {
             base.Update();
             
-            Y = (float)((Clock.CurrentTime - data.StartTimeMs) * SCROLL_SPEED);
+            // Fixed the scroll speed variable here!
+            Y = (float)((Clock.CurrentTime - data.StartTimeMs) * settings.ScrollSpeed.Value);
             noteVisual.Colour = ArenjiColorManager.GetColorForNote(data);
 
             if (Y > Height) this.Alpha = 0f; 
             else this.Alpha = ArenjiColorManager.GlobalOpacity; 
+            
             if (bodySprite != null && bodySprite.Texture != null)
             {
                 bodySprite.TextureRectangle = new RectangleF(
