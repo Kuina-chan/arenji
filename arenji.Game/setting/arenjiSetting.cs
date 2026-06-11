@@ -10,7 +10,6 @@ using osuTK.Graphics;
 using osuTK;
 using arenji.Game.Tooltips;
 using System;
-using System.Drawing;
 
 namespace arenji.Game
 {
@@ -46,8 +45,6 @@ namespace arenji.Game
         private FillFlowContainer solidSettingsGroup;
         private BasicButton advancedColorsButton;
         private BasicButton modeCycleButton;
-
-        // Allows the user to press Escape to close the panel
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (e.Key == osuTK.Input.Key.Escape && State.Value == Visibility.Visible)
