@@ -1,8 +1,11 @@
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osuTK.Graphics;
 
 namespace arenji.Game
@@ -19,6 +22,7 @@ namespace arenji.Game
         public int ChannelIndex;
         public bool HasHit { get; set; }
     }
+
     public partial class DrawableMidiNote : CompositeDrawable
     {
         private readonly VisualNoteData data;
@@ -26,7 +30,12 @@ namespace arenji.Game
         
         private const float SCROLL_SPEED = 0.5f; 
         private const int TOTAL_WHITE_KEYS = 52;
+        private const float DESIRED_CAP_HEIGHT = 20f; 
+        
         private Drawable noteVisual;
+        
+        // We need a specific reference to the body to update its tiling rectangle!
+        private Sprite bodySprite; 
 
         public DrawableMidiNote(VisualNoteData data, arenjiSettings settings)
         {
@@ -49,26 +58,69 @@ namespace arenji.Game
 
             Color4 myNoteColor = ArenjiColorManager.GetColorForNote(data);
 
-            var noteTexture = arenjiSkinManager.SkinTextures?.Get("skin/note");
+            var headTexture = arenjiSkinManager.SkinTextures?.Get("Skins/noteHead");
+            
+            // 1. THE MAGIC INGREDIENT: Ask for WrapMode.Repeat on the Y-Axis!
+            var bodyTexture = arenjiSkinManager.SkinTextures?.Get(
+                "skin/noteBody", 
+                WrapMode.ClampToEdge, // X-Axis (Don't repeat horizontally)
+                WrapMode.Repeat       // Y-Axis (Tile vertically!)
+            );
+            
+            var endTexture = arenjiSkinManager.SkinTextures?.Get("Skins/noteEnd");
 
-            if (noteTexture != null)
+            if (headTexture != null && bodyTexture != null && endTexture != null)
             {
+                float actualCapHeight = Math.Min(DESIRED_CAP_HEIGHT, Height / 2f);
+
+                // Initialize the body sprite and save it to our variable
+                bodySprite = new Sprite
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Texture = bodyTexture
+                };
+
+                noteVisual = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Top = actualCapHeight, Bottom = actualCapHeight },
+                            Child = bodySprite // Add the tiling body here
+                        },
+                        new Sprite
+                        {
+                            RelativeSizeAxes = Axes.X, Height = actualCapHeight,
+                            Anchor = Anchor.TopCentre, Origin = Anchor.TopCentre,
+                            Texture = endTexture
+                        },
+                        new Sprite
+                        {
+                            RelativeSizeAxes = Axes.X, Height = actualCapHeight,
+                            Anchor = Anchor.BottomCentre, Origin = Anchor.BottomCentre,
+                            Texture = headTexture
+                        }
+                    }
+                };
+            }
+            else if (arenjiSkinManager.SkinTextures?.Get("Skins/noteBody") != null)
+            {
+                // Note: We don't tile the 1-piece fallback, we just stretch it.
                 noteVisual = new Sprite
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Texture = noteTexture,
-                    Colour = myNoteColor 
+                    Texture = arenjiSkinManager.SkinTextures.Get("Skins/noteBody")
                 };
             }
             else
             {
-                noteVisual = new Box 
-                { 
-                    RelativeSizeAxes = Axes.Both, 
-                    Colour = myNoteColor 
-                };
+                noteVisual = new Box { RelativeSizeAxes = Axes.Both };
             }
 
+            noteVisual.Colour = myNoteColor;
             InternalChild = noteVisual;
 
             float whiteWidth = 1f / TOTAL_WHITE_KEYS;
@@ -76,14 +128,8 @@ namespace arenji.Game
                 ? (data.WhiteKeyIndex * whiteWidth) 
                 : (data.WhiteKeyIndex * whiteWidth) + (whiteWidth / 2f);
 
-            if (!data.IsBlackKey)
-            {
-                settings.WhiteNoteWidth.BindValueChanged(e => Width = whiteWidth * e.NewValue, true);
-            }
-            else
-            {
-                settings.BlackNoteWidth.BindValueChanged(e => Width = whiteWidth * e.NewValue, true);
-            }
+            if (!data.IsBlackKey) settings.WhiteNoteWidth.BindValueChanged(e => Width = whiteWidth * e.NewValue, true);
+            else settings.BlackNoteWidth.BindValueChanged(e => Width = whiteWidth * e.NewValue, true);
 
             settings.NoteRoundness.BindValueChanged(e => CornerRadius = e.NewValue, true);
         }
@@ -92,18 +138,19 @@ namespace arenji.Game
         {
             base.Update();
             
-            // Move the note
             Y = (float)((Clock.CurrentTime - data.StartTimeMs) * SCROLL_SPEED);
-
             noteVisual.Colour = ArenjiColorManager.GetColorForNote(data);
 
-            if (Y > Height) 
+            if (Y > Height) this.Alpha = 0f; 
+            else this.Alpha = ArenjiColorManager.GlobalOpacity; 
+            if (bodySprite != null && bodySprite.Texture != null)
             {
-                this.Alpha = 0f; 
-            }
-            else 
-            {
-                this.Alpha = ArenjiColorManager.GlobalOpacity; 
+                bodySprite.TextureRectangle = new RectangleF(
+                    0, 
+                    0, 
+                    bodySprite.Texture.Width, 
+                    bodySprite.DrawHeight 
+                );
             }
         }
     }
