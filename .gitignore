@@ -358,3 +358,4 @@ osu.Framework.NativeLibs/scripts/ffmpeg/*.tar.gz
 .agents
 skills-lock.json
 AGENTS.md
+*.mp4
