@@ -8,7 +8,7 @@ namespace arenji.Game.Database
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
 
-        [Indexed, Unique]
+        [Indexed(Unique = true)]
         public string FolderName { get; set; } // e.g., "Camellia - Ghost"
 
         public string Title { get; set; }
@@ -24,7 +24,7 @@ namespace arenji.Game.Database
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
 
-        [Indexed, Unique]
+        [Indexed(Unique = true)]
         public string FolderName { get; set; } // e.g., "RetroNeonSkin"
 
         public string SkinName { get; set; }
