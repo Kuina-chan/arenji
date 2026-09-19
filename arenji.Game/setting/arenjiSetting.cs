@@ -31,6 +31,7 @@ namespace arenji.Game
         public readonly BindableFloat KeyGlowOpacity = new BindableFloat(0.5f) {MinValue = 0f, MaxValue = 1f};
         public readonly BindableFloat BulbOpacity = new BindableFloat(0.8f) {MinValue = 0f, MaxValue = 1f};
         public readonly BindableFloat BulbSize = new BindableFloat(2.5f) {MinValue = 0f, MaxValue = 5f};
+        public readonly BindableFloat KeyboardHeight = new BindableFloat(120f) {MinValue = 0f, MaxValue = 400f};
         public readonly BindableFloat SaberOpacity = new BindableFloat(1f) {MinValue = 0f, MaxValue = 1f};
         public readonly BindableFloat SaberBrightness = new BindableFloat(1f){MinValue = 0f, MaxValue = 2f, Precision = 0.1f};
         public readonly BindableFloat ScrollSpeed = new BindableFloat(0.5f) {MinValue = 0.1f, MaxValue = 5f};
@@ -193,6 +194,7 @@ namespace arenji.Game
                                     },
                                     createLabeledSlider("Bulb Opacity", BulbOpacity),
                                     createLabeledSlider("Bulb Size", BulbSize),
+                                    createLabeledSlider("Keyboard Height", KeyboardHeight),
                                     new SpriteText
                                     {
                                         Text = "Saber Setting", Colour = Color4.Cyan, Margin = new MarginPadding {Top = 20, Bottom = 5}

@@ -115,6 +115,14 @@ namespace arenji.Game
             settingsPanel.SaberColor.BindValueChanged(_ => updateSaberGraphics(), true);
             settingsPanel.SaberOpacity.BindValueChanged(_ => updateSaberGraphics(), true);
             settingsPanel.SaberBrightness.BindValueChanged(_ => updateSaberGraphics(), true);
+            
+            settingsPanel.KeyboardHeight.BindValueChanged(e => 
+            {
+                keyboard.Height = e.NewValue;
+                noteCanvas.Padding = new MarginPadding { Bottom = e.NewValue };
+                saberLayer.Y = 5 - (e.NewValue - 120);
+            }, true);
+
             settingsPanel.OnRequestImport = () => projectSelector.Show();
             settingsPanel.OnRequestAdvancedColors = (mode) => advancedColorOverlay.OpenForMode(mode);
             settingsPanel.OnRequestImport = () => importPrompt.Show();

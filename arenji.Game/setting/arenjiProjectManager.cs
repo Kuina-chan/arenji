@@ -57,6 +57,7 @@ namespace arenji.Game
                 $"ParticleCount={settingsPanel.ParticleCount.Value}",
                 "",
                 "[Keyboard Setting]",
+                $"KeyboardHeight={settingsPanel.KeyboardHeight.Value}",
                 $"BulbOpacity={settingsPanel.BulbOpacity.Value}",
                 $"BulbSize={settingsPanel.BulbSize.Value}",
                 "",
@@ -204,7 +205,8 @@ namespace arenji.Game
                 }
                 else if (currentSection == "[Keyboard Setting]")
                 {
-                    if (key == "BulbOpacity") settingsPanel.BulbOpacity.Value = float.Parse(value);
+                    if (key == "KeyboardHeight") settingsPanel.KeyboardHeight.Value = float.Parse(value);
+                    else if (key == "BulbOpacity") settingsPanel.BulbOpacity.Value = float.Parse(value);
                     else if (key == "BulbSize") settingsPanel.BulbSize.Value = float.Parse(value);
                 }
                 else if (currentSection == "[Saber Setting]")
