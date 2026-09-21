@@ -4,7 +4,8 @@
 A MIDI visualizer based on [osu-framework](https://github.com/ppy/osu-framework)
 
 ## Q: Why did I created this when other apps like SeeMusic and Embers exist?
-Seemusic is a unity-based visualizer has caused me numerous headache over the year (especially some of their UI/UX handling); and given that it's a subscription software, it's not tolerable at all.
+Seemusic: A Unity-based visualizer has caused me numerous headache over the year (especially some of their UI/UX handling); and given that it's a subscription software, it's not tolerable at all.
+
 Ember: I also use over the time, but the decision to lock out some of the crucial function behind a paywall also make my experience not that good.
 
 ## Great, I want to help developing this program!
@@ -20,3 +21,5 @@ If you using AI to vibecode or debug a new problem, please make sure that **you*
 
 ## License:
 The [MeltySynth](https://github.com/sinshu/meltysynth), [osu-framework](https://github.com/ppy/osu-framework) and [DryWetMidi](https://github.com/melanchall/drywetmidi) is licensed under MIT License
+
+This whole software is licensed under **GPL v3**.
