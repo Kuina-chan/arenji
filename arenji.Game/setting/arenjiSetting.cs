@@ -169,9 +169,9 @@ namespace arenji.Game
                                         BackgroundColour = Color4.MediumSeaGreen, Margin = new MarginPadding { Bottom = 10 },
                                         Action = () => OnRequestAudioImport?.Invoke()
                                     },
-                                    createToggleButton("Soundfont (MIDI)", MuteSoundfont),
+                                    createToggleButton("Soundfont (MIDI)", MuteSoundfont, " [on]", " [off]"),
                                     createLabeledSlider("Soundfont Volume", SoundFontVolume),
-                                    createToggleButton("Backing Audio", MuteBackingAudio),
+                                    createToggleButton("Backing Audio", MuteBackingAudio, " [on]", " [off]"),
                                     createLabeledSlider("Backing Volume", BackingAudioVolume),
                                     new SpriteText 
                                     { 
@@ -360,14 +360,14 @@ namespace arenji.Game
             };
         }
 
-        private Drawable createToggleButton(string label, BindableBool bindable)
+        private Drawable createToggleButton(string label, BindableBool bindable, string trueLabel = "", string falseLabel = "")
         {
             var button = new BasicButton { RelativeSizeAxes = Axes.X, Height = 40 };
 
             // Update visuals when the bindable changes
             bindable.BindValueChanged(e =>
             {
-                button.Text = label + (e.NewValue ? " [MUTED]" : " [ON]");
+                button.Text = label + (e.NewValue ? trueLabel : falseLabel);
                 button.BackgroundColour = e.NewValue ? Color4.DarkRed : Color4.DarkGreen;
             }, true);
 
