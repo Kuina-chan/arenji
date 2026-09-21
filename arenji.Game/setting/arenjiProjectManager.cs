@@ -27,6 +27,7 @@ namespace arenji.Game
             var lines = new List<string>
             {
                 "[General]",
+                $"ProjectSkin={settingsPanel.ProjectSkin.Value}",
                 $"MidiFile={CurrentMidiFileName}",
                 "",
                 "[Note Setting]",
@@ -159,6 +160,7 @@ namespace arenji.Game
                 if (currentSection == "[General]")
                 {
                     if (key == "MidiFile") CurrentMidiFileName = value;      
+                    else if (key == "ProjectSkin") settingsPanel.ProjectSkin.Value = bool.Parse(value);
                 }
 
                 else if (currentSection == "[Note Setting]")

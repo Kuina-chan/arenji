@@ -87,6 +87,11 @@ namespace arenji.Game
             }
             else
             {
+                if (audioEngine.AudioClock.CurrentTime >= audioEngine.DurationMs - 10)
+                {
+                    SeekBindable.Value = 0;
+                }
+
                 audioEngine.Play();
                 backingTrack?.Start(); 
                 

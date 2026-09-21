@@ -108,6 +108,10 @@ namespace arenji.Game
                 arenjiProjectManager.SaveCurrentProject(settingsPanel);
             };
 
+            settingsPanel.ProjectSkin.BindValueChanged(e => 
+            {
+                arenjiSkinManager.UpdateSkinStore(arenjiProjectManager.CurrentProjectFolder, e.NewValue);
+            }, true);
             settingsPanel.MuteSoundfont.BindValueChanged(_ => applyMasterVolumes(), true);
             settingsPanel.MuteBackingAudio.BindValueChanged(_ => applyMasterVolumes(), true);
             settingsPanel.SoundFontVolume.BindValueChanged(_ => applyMasterVolumes(), true);
