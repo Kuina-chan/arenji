@@ -11,9 +11,21 @@ namespace arenji.Game.Database
     {
         private static SQLiteAsyncConnection db;
         
-        private static readonly string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        private static readonly string songsDir = Path.Combine(baseDir, "Songs");
-        private static readonly string skinsDir = Path.Combine(baseDir, "Skins");
+        private static string GetProjectRoot()
+        {
+            string current = AppDomain.CurrentDomain.BaseDirectory;
+            while (current != null)
+            {
+                if (Directory.GetFiles(current, "*.sln").Length > 0)
+                    return current;
+                current = Directory.GetParent(current)?.FullName;
+            }
+            return AppDomain.CurrentDomain.BaseDirectory;
+        }
+
+        private static readonly string baseDir = GetProjectRoot();
+        private static readonly string songsDir = Path.Combine(baseDir, "arenji.Resources", "Songs");
+        private static readonly string skinsDir = Path.Combine(baseDir, "arenji.Resources", "Skins");
         private static readonly string dbPath = Path.Combine(baseDir, "arenji.db");
 
         public static async Task InitializeAsync()

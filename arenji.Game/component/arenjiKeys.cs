@@ -17,7 +17,7 @@ namespace arenji.Game
         public readonly bool IsBlack;
         
         // Changed to Drawable so we can swap between a Sprite (skin) or a Circle (fallback)
-        private Drawable lightBulb; 
+        public Drawable lightBulb; 
         
         public Action<PianoKey, Vector2, float, Color4, int> OnKeyHit;
         
@@ -83,7 +83,6 @@ namespace arenji.Game
             }
             InternalChildren = new Drawable[]
             {
-                lightBulb, 
                 keyVisual,
                 new Box    // Draws the border last
                 {

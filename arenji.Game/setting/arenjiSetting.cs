@@ -31,12 +31,14 @@ namespace arenji.Game
         public readonly BindableFloat KeyGlowOpacity = new BindableFloat(0.5f) {MinValue = 0f, MaxValue = 1f};
         public readonly BindableFloat BulbOpacity = new BindableFloat(0.8f) {MinValue = 0f, MaxValue = 1f};
         public readonly BindableFloat BulbSize = new BindableFloat(2.5f) {MinValue = 0f, MaxValue = 5f};
+        public readonly BindableFloat KeyboardHeight = new BindableFloat(120f) {MinValue = 0f, MaxValue = 400f};
         public readonly BindableFloat SaberOpacity = new BindableFloat(1f) {MinValue = 0f, MaxValue = 1f};
         public readonly BindableFloat SaberBrightness = new BindableFloat(1f){MinValue = 0f, MaxValue = 2f, Precision = 0.1f};
         public readonly BindableFloat ScrollSpeed = new BindableFloat(0.5f) {MinValue = 0.1f, MaxValue = 5f};
         public readonly Bindable<Color4> SaberColor = new Bindable<Color4>(Color4.Gold);
         public readonly BindableBool MuteSoundfont = new BindableBool(false);
         public readonly BindableBool MuteBackingAudio = new BindableBool(false);
+        public readonly BindableBool ProjectSkin = new BindableBool(false);
         public Action OnRequestAudioImport;
         public Action OnRequestSaberColor;
         public Action<NoteColorMode> OnRequestAdvancedColors;
@@ -158,6 +160,8 @@ namespace arenji.Game
                                     BackgroundImport,
                                     createLabeledSlider("Background Opacity", BackgroundOpacity),
                                     createLabeledSlider("Video Background Offset (s)", BackgroundOffset),
+                                    new SpriteText { Text = "Skin Settings", Font = FrameworkFont.Regular.With(size: 24), Colour = Color4.Cyan, Margin = new MarginPadding { Top = 20, Bottom = 5 } },
+                                    createToggleButton("Use Project Skin", ProjectSkin),
                                     new SpriteText { Text = "Audio Settings", Font = FrameworkFont.Regular.With(size: 24), Colour = Color4.Cyan, Margin = new MarginPadding { Top = 20, Bottom = 5 } },
                                     new BasicButton
                                     {
@@ -165,9 +169,9 @@ namespace arenji.Game
                                         BackgroundColour = Color4.MediumSeaGreen, Margin = new MarginPadding { Bottom = 10 },
                                         Action = () => OnRequestAudioImport?.Invoke()
                                     },
-                                    createToggleButton("Soundfont (MIDI)", MuteSoundfont),
+                                    createToggleButton("Soundfont (MIDI)", MuteSoundfont, " [on]", " [off]"),
                                     createLabeledSlider("Soundfont Volume", SoundFontVolume),
-                                    createToggleButton("Backing Audio", MuteBackingAudio),
+                                    createToggleButton("Backing Audio", MuteBackingAudio, " [on]", " [off]"),
                                     createLabeledSlider("Backing Volume", BackingAudioVolume),
                                     new SpriteText 
                                     { 
@@ -193,6 +197,7 @@ namespace arenji.Game
                                     },
                                     createLabeledSlider("Bulb Opacity", BulbOpacity),
                                     createLabeledSlider("Bulb Size", BulbSize),
+                                    createLabeledSlider("Keyboard Height", KeyboardHeight),
                                     new SpriteText
                                     {
                                         Text = "Saber Setting", Colour = Color4.Cyan, Margin = new MarginPadding {Top = 20, Bottom = 5}
@@ -355,14 +360,14 @@ namespace arenji.Game
             };
         }
 
-        private Drawable createToggleButton(string label, BindableBool bindable)
+        private Drawable createToggleButton(string label, BindableBool bindable, string trueLabel = "", string falseLabel = "")
         {
             var button = new BasicButton { RelativeSizeAxes = Axes.X, Height = 40 };
 
             // Update visuals when the bindable changes
             bindable.BindValueChanged(e =>
             {
-                button.Text = label + (e.NewValue ? " [MUTED]" : " [ON]");
+                button.Text = label + (e.NewValue ? trueLabel : falseLabel);
                 button.BackgroundColour = e.NewValue ? Color4.DarkRed : Color4.DarkGreen;
             }, true);
 

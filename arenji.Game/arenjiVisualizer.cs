@@ -108,6 +108,10 @@ namespace arenji.Game
                 arenjiProjectManager.SaveCurrentProject(settingsPanel);
             };
 
+            settingsPanel.ProjectSkin.BindValueChanged(e => 
+            {
+                arenjiSkinManager.UpdateSkinStore(arenjiProjectManager.CurrentProjectFolder, e.NewValue);
+            }, true);
             settingsPanel.MuteSoundfont.BindValueChanged(_ => applyMasterVolumes(), true);
             settingsPanel.MuteBackingAudio.BindValueChanged(_ => applyMasterVolumes(), true);
             settingsPanel.SoundFontVolume.BindValueChanged(_ => applyMasterVolumes(), true);
@@ -115,6 +119,14 @@ namespace arenji.Game
             settingsPanel.SaberColor.BindValueChanged(_ => updateSaberGraphics(), true);
             settingsPanel.SaberOpacity.BindValueChanged(_ => updateSaberGraphics(), true);
             settingsPanel.SaberBrightness.BindValueChanged(_ => updateSaberGraphics(), true);
+            
+            settingsPanel.KeyboardHeight.BindValueChanged(e => 
+            {
+                keyboard.Height = e.NewValue;
+                noteCanvas.Padding = new MarginPadding { Bottom = e.NewValue };
+                saberLayer.Y = 5 - (e.NewValue - 120);
+            }, true);
+
             settingsPanel.OnRequestImport = () => projectSelector.Show();
             settingsPanel.OnRequestAdvancedColors = (mode) => advancedColorOverlay.OpenForMode(mode);
             settingsPanel.OnRequestImport = () => importPrompt.Show();
@@ -259,8 +271,13 @@ namespace arenji.Game
             string fullPath = Path.Combine(arenjiProjectManager.CurrentProjectFolder, "bg", filename);
             if (!File.Exists(fullPath))
             {
-                backgroundLayer.Add(defaultBox);
-                return;
+                // Fallback to checking the root folder
+                fullPath = Path.Combine(arenjiProjectManager.CurrentProjectFolder, filename);
+                if (!File.Exists(fullPath))
+                {
+                    backgroundLayer.Add(defaultBox);
+                    return;
+                }
             }
 
             string ext = Path.GetExtension(fullPath).ToLower();
@@ -326,7 +343,11 @@ namespace arenji.Game
             string localSongsFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Songs");
             bool isLocalMenuSong = filePath.StartsWith(localSongsFolder, StringComparison.OrdinalIgnoreCase);
     
-            string existingIniPath = Directory.GetFiles(directory, "*.ini").FirstOrDefault();
+            string existingIniPath = null;
+            if (Directory.Exists(directory))
+            {
+                existingIniPath = Directory.GetFiles(directory, "*.ini").FirstOrDefault();
+            }
 
             if (!string.IsNullOrEmpty(existingIniPath))
             {
@@ -349,9 +370,40 @@ namespace arenji.Game
                     }
                     
                     LoadNewMidi(targetMidi, midiFile);
+                    ApplyBackingAudio(arenjiProjectManager.CurrentBackingAudioPath);
+                    ApplyBackground(arenjiProjectManager.CurrentBackgroundPath);
                     return;
                 }
             }
+            else if (isLocalMenuSong && (filePath.EndsWith(".mid", StringComparison.OrdinalIgnoreCase) || filePath.EndsWith(".midi", StringComparison.OrdinalIgnoreCase)))
+            {
+                string targetMidi = filePath;
+                arenjiProjectManager.CurrentProjectFolder = directory;
+                arenjiProjectManager.CurrentMidiFileName = Path.GetFileName(targetMidi);
+                
+                string audioFile = Directory.GetFiles(directory, "*.mp3").Select(Path.GetFileName).FirstOrDefault()
+                                ?? Directory.GetFiles(directory, "*.ogg").Select(Path.GetFileName).FirstOrDefault();
+                arenjiProjectManager.CurrentBackingAudioPath = audioFile ?? string.Empty;
+
+                string bgFile = Directory.GetFiles(directory, "*.mp4").Select(Path.GetFileName).FirstOrDefault()
+                             ?? Directory.GetFiles(directory, "*.png").Select(Path.GetFileName).FirstOrDefault()
+                             ?? Directory.GetFiles(directory, "*.jpg").Select(Path.GetFileName).FirstOrDefault();
+                arenjiProjectManager.CurrentBackgroundPath = bgFile ?? string.Empty;
+
+                arenjiProjectManager.SaveCurrentProject(settingsPanel);
+
+                Melanchall.DryWetMidi.Core.MidiFile midiFile;
+                using (var stream = new FileStream(targetMidi, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    midiFile = Melanchall.DryWetMidi.Core.MidiFile.Read(stream);
+                }
+
+                LoadNewMidi(targetMidi, midiFile);
+                ApplyBackingAudio(arenjiProjectManager.CurrentBackingAudioPath);
+                ApplyBackground(arenjiProjectManager.CurrentBackgroundPath);
+                return;
+            }
+
             if (filePath.EndsWith(".mid", StringComparison.OrdinalIgnoreCase) || filePath.EndsWith(".midi", StringComparison.OrdinalIgnoreCase))
             {
                 projectPrompt.OnConfirm = (parentPath, projectName) =>
@@ -382,7 +434,19 @@ namespace arenji.Game
                 backingTrack = null;
             }
 
-            if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) return;
+            if (string.IsNullOrEmpty(filePath)) return;
+
+            if (!Path.IsPathRooted(filePath))
+            {
+                if (!string.IsNullOrEmpty(arenjiProjectManager.CurrentProjectFolder))
+                {
+                    string audioFolder = Path.Combine(arenjiProjectManager.CurrentProjectFolder, "audio", filePath);
+                    if (File.Exists(audioFolder)) filePath = audioFolder;
+                    else filePath = Path.Combine(arenjiProjectManager.CurrentProjectFolder, filePath);
+                }
+            }
+
+            if (!File.Exists(filePath)) return;
 
             try
             {

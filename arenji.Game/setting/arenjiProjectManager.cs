@@ -27,6 +27,7 @@ namespace arenji.Game
             var lines = new List<string>
             {
                 "[General]",
+                $"ProjectSkin={settingsPanel.ProjectSkin.Value}",
                 $"MidiFile={CurrentMidiFileName}",
                 "",
                 "[Note Setting]",
@@ -57,6 +58,7 @@ namespace arenji.Game
                 $"ParticleCount={settingsPanel.ParticleCount.Value}",
                 "",
                 "[Keyboard Setting]",
+                $"KeyboardHeight={settingsPanel.KeyboardHeight.Value}",
                 $"BulbOpacity={settingsPanel.BulbOpacity.Value}",
                 $"BulbSize={settingsPanel.BulbSize.Value}",
                 "",
@@ -158,6 +160,7 @@ namespace arenji.Game
                 if (currentSection == "[General]")
                 {
                     if (key == "MidiFile") CurrentMidiFileName = value;      
+                    else if (key == "ProjectSkin") settingsPanel.ProjectSkin.Value = bool.Parse(value);
                 }
 
                 else if (currentSection == "[Note Setting]")
@@ -204,7 +207,8 @@ namespace arenji.Game
                 }
                 else if (currentSection == "[Keyboard Setting]")
                 {
-                    if (key == "BulbOpacity") settingsPanel.BulbOpacity.Value = float.Parse(value);
+                    if (key == "KeyboardHeight") settingsPanel.KeyboardHeight.Value = float.Parse(value);
+                    else if (key == "BulbOpacity") settingsPanel.BulbOpacity.Value = float.Parse(value);
                     else if (key == "BulbSize") settingsPanel.BulbSize.Value = float.Parse(value);
                 }
                 else if (currentSection == "[Saber Setting]")

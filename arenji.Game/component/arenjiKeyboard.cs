@@ -19,9 +19,17 @@ namespace arenji.Game
 
         private Dictionary<int, PianoKey> keysByPitch = new Dictionary<int, PianoKey>();
 
+        private Container bulbLayer;
+        private Container keyLayer;
+
         [BackgroundDependencyLoader]
         private void load()
         {
+            bulbLayer = new Container { RelativeSizeAxes = Axes.Both };
+            keyLayer = new Container { RelativeSizeAxes = Axes.Both };
+            AddInternal(bulbLayer);
+            AddInternal(keyLayer);
+
             int whiteKeyIndex = 0;
             var whiteKeyTexture = arenjiSkinManager.SkinTextures?.Get("skin/keyWhite");
             var darkKeyTexture = arenjiSkinManager.SkinTextures?.Get("skin/keyDark");
@@ -58,7 +66,21 @@ namespace arenji.Game
                 }
 
                 keysByPitch[pitch] = key; 
-                AddInternal(key);
+                keyLayer.Add(key);
+
+                if (key.lightBulb != null)
+                {
+                    bulbLayer.Add(new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        RelativePositionAxes = Axes.X,
+                        Width = key.Width,
+                        Height = key.Height,
+                        X = key.X,
+                        Anchor = Anchor.TopLeft, Origin = Anchor.TopLeft,
+                        Child = key.lightBulb
+                    });
+                }
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -13,6 +14,8 @@ namespace arenji.Game
 {
     public partial class arenjiGame : osu.Framework.Game
     {
+        public static bool DirectoriesExistedOnOpen { get; private set; } = true;
+
         private string[] launchArguments;
         private ScreenStack screenStack;
 
@@ -24,6 +27,28 @@ namespace arenji.Game
         [BackgroundDependencyLoader]
         private void load()
         {
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string songsPath = Path.Combine(baseDir, "Songs");
+            string skinsPath = Path.Combine(baseDir, "Skins");
+
+            bool songsExist = Directory.Exists(songsPath);
+            bool skinsExist = Directory.Exists(skinsPath);
+            if (!songsExist || !skinsExist)
+            {
+                DirectoriesExistedOnOpen = false;
+                try
+                {
+                    if (!songsExist)
+                        Directory.CreateDirectory(songsPath);
+                    if (!Directory.Exists(skinsPath))
+                        Directory.CreateDirectory(skinsPath);
+                }
+                catch (Exception ex)
+                {
+                    osu.Framework.Logging.Logger.Log($"Failed to create directories on open: {ex.Message}", osu.Framework.Logging.LoggingTarget.Runtime, osu.Framework.Logging.LogLevel.Error);
+                }
+            }
+
             // Boot the database immediately
             Task.Run(async () => await arenjiDatabaseManager.InitializeAsync());
             

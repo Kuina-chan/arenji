@@ -357,3 +357,11 @@ osu.Framework.NativeLibs/scripts/ffmpeg/*.tar.gz
 # AI stuff
 .agents
 skills-lock.json
+AGENTS.md
+#big assets
+*.mp4
+*.webm
+*.avi
+*.mov
+#local db
+*.db

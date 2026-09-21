@@ -81,6 +81,11 @@ namespace arenji.Game
             }
             else
             {
+                if (linkedClock.CurrentTime >= SeekBindable.MaxValue - 10)
+                {
+                    SeekBindable.Value = 0;
+                }
+
                 // We no longer need to seek here, the ValueChanged event handles it!
                 linkedClock.Start();
                 playPauseButton.Text = "Pause";

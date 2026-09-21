@@ -59,11 +59,26 @@ namespace arenji.Game
             {
                 if (songs.Count == 0)
                 {
-                    songListContainer.Add(new SpriteText
+                    if (!arenjiGame.DirectoriesExistedOnOpen)
                     {
-                        Text = "No songs found in the local database! Drop some folders in the Songs directory.",
-                        Font = FontUsage.Default.With(size: 24)
-                    });
+                        AddInternal(new SpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Text = "No songs found in the local database! Drop some folders in the Songs directory.",
+                            Font = FontUsage.Default.With(size: 24)
+                        });
+                    }
+                    else
+                    {
+                        songListContainer.Add(new SpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Text = "No songs found in the local database! Drop some folders in the Songs directory.",
+                            Font = FontUsage.Default.With(size: 24)
+                        });
+                    }
                     return;
                 }
 
