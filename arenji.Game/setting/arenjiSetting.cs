@@ -38,6 +38,7 @@ namespace arenji.Game
         public readonly Bindable<Color4> SaberColor = new Bindable<Color4>(Color4.Gold);
         public readonly BindableBool MuteSoundfont = new BindableBool(false);
         public readonly BindableBool MuteBackingAudio = new BindableBool(false);
+        public readonly BindableBool ProjectSkin = new BindableBool(false);
         public Action OnRequestAudioImport;
         public Action OnRequestSaberColor;
         public Action<NoteColorMode> OnRequestAdvancedColors;
@@ -159,6 +160,8 @@ namespace arenji.Game
                                     BackgroundImport,
                                     createLabeledSlider("Background Opacity", BackgroundOpacity),
                                     createLabeledSlider("Video Background Offset (s)", BackgroundOffset),
+                                    new SpriteText { Text = "Skin Settings", Font = FrameworkFont.Regular.With(size: 24), Colour = Color4.Cyan, Margin = new MarginPadding { Top = 20, Bottom = 5 } },
+                                    createToggleButton("Use Project Skin", ProjectSkin),
                                     new SpriteText { Text = "Audio Settings", Font = FrameworkFont.Regular.With(size: 24), Colour = Color4.Cyan, Margin = new MarginPadding { Top = 20, Bottom = 5 } },
                                     new BasicButton
                                     {
