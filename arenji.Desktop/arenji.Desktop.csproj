@@ -10,6 +10,8 @@
   </PropertyGroup>
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\arenji.Game\arenji.Game.csproj" />
+    <None Remove="Songs/**" />
+    <None Remove="Skins/**" />
   </ItemGroup>
   <ItemGroup Label="Resources">
     <EmbeddedResource Include="game.ico" />
